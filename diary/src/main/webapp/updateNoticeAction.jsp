@@ -19,7 +19,7 @@
 	}
 	
 	if(request.getParameter("noticeNo")==null
-			|| request.getParameter("noticeNo").equals("")){
+		||request.getParameter("noticeTitle").equals("")){
 		 response.sendRedirect("./noticeList.jsp");
 		 return;
 	}
