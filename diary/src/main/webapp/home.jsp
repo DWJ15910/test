@@ -15,7 +15,7 @@
 	<div><!-- 메인메뉴 -->
 		<a class="btn btn-secondary" href="./home.jsp">홈으로</a>
 		<a class="btn btn-secondary" href="./noticeList.jsp">공지 리스트</a>
-		<a class="btn btn-secondary" href="./diaryList.jsp">일정 리스트</a>
+		<a class="btn btn-secondary" href="./scheduleList.jsp">일정 리스트</a>
 	</div>
 	
 	<!-- 날짜순 최근 공지 5개 -->
@@ -26,16 +26,23 @@
 		
 		Class.forName("org.mariadb.jdbc.Driver"); //드라이버 부르기
 		System.out.println("드라이버 정상 실행"); // 드라이버 정상 실행 확인
-		
 		//conn 객체 변수 클래스 타입 가능하면 객체와 비슷한 타입의 변수선언이 좋다
+		
 		Connection conn = DriverManager.getConnection("jdbc:mariadb://127.0.0.1:3306/diary","root","java1234");
 		// 주소,사용자id,사용자pw
 		// 주소는 프로토콜,ip주소or도메인,포트넘버
-		PreparedStatement stmt = conn.prepareStatement("select notice_no,notice_title, createdate from notice order by createdate desc limit 0,5");
-		//내가보낸 문자열 모양의 쿼리를 mariadb가 실행 가능한 쿼리 형태로 변환
-		System.out.println(stmt + "<--stmt"); //stmt 정상 실행 확인
 		
-		ResultSet rs = stmt.executeQuery();
+		String sql1 = "select notice_no,notice_title, createdate from notice order by createdate desc limit 0,5";
+		String sql2 = "select schedule_no, schedule_date, schedule_time, substr(schedule_memo,1,10) memo from schedule where schedule_date = curdate() order by schedule_time";
+		PreparedStatement stmt1 = conn.prepareStatement(sql1);
+		PreparedStatement stmt2 = conn.prepareStatement(sql2);
+		//내가보낸 문자열 모양의 쿼리를 mariadb가 실행 가능한 쿼리 형태로 변환
+		
+		System.out.println(stmt1 + "<--stmt1"); //stmt 정상 실행 확인
+		System.out.println(stmt2 + "<--stmt2"); //stmt 정상 실행 확인
+		
+		ResultSet rs1 = stmt1.executeQuery();
+		ResultSet rs2 = stmt2.executeQuery();
 	%>
 	<h1>공지사항</h1>
 	<table class="table table-striped">
@@ -45,16 +52,43 @@
 			<th>createdate</th>
 		</tr>
 		<%
-			while(rs.next()){
+			while(rs1.next()){
 		%>
 			<tr>
-				<td><%=rs.getInt("notice_no") %></td>
+				<td><%=rs1.getInt("notice_no") %></td>
 				<td>
-					<a href="./noticeOne.jsp?noticeNo=<%=rs.getInt("notice_no")%>">
-					<%=rs.getString("notice_title") %>
+					<a href="./noticeOne.jsp?noticeNo=<%=rs1.getInt("notice_no")%>">
+					<%=rs1.getString("notice_title") %>
 					</a>
 				</td>
-				<td><%=rs.getString("createdate").substring(0,10) %></td>
+				<td><%=rs1.getString("createdate").substring(0,10) %></td>
+			</tr>
+		<%
+			}
+		%>
+	</table>
+	<h1>오늘일정</h1>
+	<table class="table table-striped">
+		<tr>
+			<th>schedule_date</th>
+			<th>schedule_time</th>
+			<th>schedule_memo</th>
+		</tr>
+		<%
+			while(rs2.next()){
+		%>
+			<tr>
+				<td>
+					<%=rs2.getString("schedule_date") %>
+				</td>
+				<td>
+					<%=rs2.getString("schedule_time") %>
+				</td>
+				<td>	
+					<a href="./scheduleOne.jsp?scheduleNo=<%=rs2.getInt("schedule_no")%>">
+						<%=rs2.getString("memo")%>
+					</a>
+				</td>
 			</tr>
 		<%
 			}
