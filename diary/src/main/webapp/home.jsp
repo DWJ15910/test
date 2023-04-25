@@ -54,6 +54,7 @@
 		ResultSet rs1 = stmt1.executeQuery();
 		ResultSet rs2 = stmt2.executeQuery();
 		
+		//ArrayList Notice부분 데이터 추가
 		ArrayList<Notice> noticeList = new ArrayList<Notice>();
 		while(rs1.next()) {
 			Notice n = new Notice();
@@ -63,6 +64,7 @@
 			noticeList.add(n);
 		}
 		
+		//ArrayList클래스에 scheduleList 변수를 선언하고 ArrayList의 객체를 생성한뒤 이를 변수에 할당한다
 		ArrayList<Schedule> scheduleList = new ArrayList<Schedule>();
 		while(rs2.next()){
 			Schedule s = new Schedule();
@@ -104,6 +106,7 @@
 			<th>schedule_memo</th>
 		</tr>
 		<%
+			//scheduleList객체에서 Schedule이라는 클래스의 객체를하나씩 가져와서 s라는 변수에 할당하는 반복문이다
 			for(Schedule s : scheduleList){
 		%>
 			<tr>
@@ -123,6 +126,15 @@
 			}
 		%>
 	</table>
+	<br>
+	<h2>사용기술</h2>
+	<div>1. html</div>
+	<div>2. css bootstrap</div>
+	<div>3. java ArrayList를 통해서 rs.next를 교체</div>
+	<div>4. MariaDB 와 연동하여 공지사항 리스트 추가</div>
+	<div>5. 공지사항의 삽입, 삭제, 수정이 가능함</div>
+	<div>6. 스케쥴 일정 달력 추가</div>
+	<div>7. 달력 날짜를 누른 뒤 삽입, 삭제, 수정이 가능함</div>
 	</div>
 </body>
 </html>

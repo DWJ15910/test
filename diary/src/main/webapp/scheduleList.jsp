@@ -35,12 +35,13 @@
 	Calendar today = Calendar.getInstance();
 	int todayDate = today.get(Calendar.DATE);
 	
-	// targetMonth 1일의 요일
+	// firstDay라는 Calendar의 변수에 Calendar객체에서 받아온 값을 넣는다
 	Calendar firstDay = Calendar.getInstance();
 	firstDay.set(Calendar.YEAR, targetYear);
 	firstDay.set(Calendar.MONTH, targetMonth);
 	firstDay.set(Calendar.DATE, 1);
 	
+	//secondDay라는 Calendar의 변수에 Calendar객체에서 받아온 값을 넣는다
 	Calendar secondDay = Calendar.getInstance();
 	secondDay.set(Calendar.YEAR, targetYear);
 	secondDay.set(Calendar.MONTH, targetMonth-1);
@@ -110,8 +111,6 @@
 	td {
 		padding: 10px;
 		width: 10%;
-	}
-	tr {
 		height: 150px;
 	}
 	a{
@@ -119,6 +118,11 @@
 		color: #000000;
 		font-size: 12pt;
 		font-weight: bold;
+	}
+	.asdf {/* 표시할 텍스트 줄 수 */
+		overflow: hidden;
+		text-overflow: ellipsis; 
+		 white-space: nowrap;
 	}
 </style>
 </head>
@@ -129,10 +133,16 @@
 		<a class="btn btn-secondary" href="./noticeList.jsp">공지 리스트</a>
 		<a class="btn btn-secondary" href="./scheduleList.jsp">일정 리스트</a>
 	</div>
-		<h1><%=targetYear %>년 <%=targetMonth+1%>월</h1>
-	<div>
-		<a class="btn btn-secondary" href="./scheduleList.jsp?targetYear=<%=targetYear%>&targetMonth=<%=targetMonth-1%>">이전달</a>
-		<a class="btn btn-secondary" href="./scheduleList.jsp?targetYear=<%=targetYear%>&targetMonth=<%=targetMonth+1%>">다음달</a>
+		<div class="row">
+			<h1 class="text-center"><%=targetYear %>년 <%=targetMonth+1%>월</h1>
+		</div>
+	<div class="row">
+		<div class="col-sm-6 text-white text-left">
+			<a class="btn btn-secondary" href="./scheduleList.jsp?targetYear=<%=targetYear%>&targetMonth=<%=targetMonth-1%>">이전달</a>
+		</div>
+		<div style ="text-align: right" class="col-sm-6 text-white text-right">
+			<a class="btn btn-secondary" href="./scheduleList.jsp?targetYear=<%=targetYear%>&targetMonth=<%=targetMonth+1%>">다음달</a>
+		</div>
 	</div>
 	
 	<table class="table table-striped">
@@ -146,7 +156,7 @@
 			<th>토</th>
 		</tr>
 		
-		<tr>
+		<tr style="height:100px;">
 			<%
 				for(int i = 0; i<totalTd; i++){
 					int dateNum = i-startBlank+1;
@@ -174,9 +184,10 @@
 							<div><!-- 일정 memo(5글자만) -->
 								<%
 									for(Schedule s : scheduleList){
-										if(dateNum == Integer.parseInt(s.scheduleDate)){
+										if(dateNum == Integer.parseInt(s.scheduleDate)){		
+											
 								%>
-										<div style="color:<%=s.scheduleColor%>"><%=s.scheduleMemo %></div>
+										<div class="asdf" style="color:<%=s.scheduleColor%>"><%=s.scheduleMemo %></div>
 								<%
 										}
 									}

@@ -34,8 +34,14 @@
 	ResultSet rs = stmt.executeQuery();
 	System.out.println(rs + "<--rs");
 	
+	//ArrayList Notice<--vo.Notice.java.class 호출 변수선언 = new 선언;
 	ArrayList<Notice> noticeList = new ArrayList<Notice>();
+	
+	//Notice 클래스에 n이라는 변수 선언 후 n.~~에 rs.next()를 통해 sql에서 값을 받아와서 값을 저장
+	//이후에 noticeList에 add메서드를 이용하여 값 저장
 	while(rs.next()) {
+		//Notice클래스의 변수n선언 = Notice클래스의 새로운 객체를 생성
+		//Notice클래스의 새로운 객체를 생성하여 Notice클래스의 변수 n에 할당한다
 		Notice n = new Notice();
 		n.noticeTitle = rs.getString("noticeTitle");
 		n.noticeNo = rs.getInt("noticeNo");
@@ -70,6 +76,7 @@
 	<h1>수정페이지</h1>
 	<div>
 		<%
+			//msg가 null이 아니면 msg출력
 			if(request.getParameter("msg") != null) {
 		%>
 				<%=request.getParameter("msg")%>
@@ -80,6 +87,7 @@
 	<form action="./updateNoticeAction.jsp" method="post">
 		<table class="table table-striped">
 		<%
+			//Notice클래수의 변수 n을 
 			for(Notice n : noticeList){
 		%>
 			<tr>

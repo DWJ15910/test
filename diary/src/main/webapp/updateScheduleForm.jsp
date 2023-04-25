@@ -35,12 +35,17 @@
 	ResultSet rs = stmt.executeQuery();
 	System.out.println(rs + "<--rs");
 	
+	//ArrayList<Schedule>클래스의 새로운 변수 scheudleList를 선언하고
+	//ArrayList<Schedule>클래스의 새로운 객체를 생성하여 이를 scheduleList에 할당한다
 	ArrayList<Schedule> scheduleList = new ArrayList<Schedule>();
 	while(rs.next()){
+		//Class Schedule 의 변수 s에 Schedule클래스의 새로운 객체의 값을 할당한다.
 		Schedule s = new Schedule();
 		s.scheduleNo = rs.getInt("scheduleNo");
 		s.createdate = rs.getString("createdate");
 		s.updatedate = rs.getString("updatedate");
+		
+		//scheduleList라는 ArrayList에 add라는 메서드를 통해 s라는 객체를 추가하는것
 		scheduleList.add(s);
 	}
 %>
