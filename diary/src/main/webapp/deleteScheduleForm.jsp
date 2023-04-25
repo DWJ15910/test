@@ -20,11 +20,15 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
+	<div class="container">
+	<a href="./scheduleList.jsp" class="btn btn-secondary">홈으로</a>
 	<h1>삭제하기</h1>
 	<form action="./deleteScheduleAction.jsp" method="post">
-		<table>
+		<table class="table table-striped">
 			<tr>
 				<td>schedule_no</td>
 				<td>
@@ -41,10 +45,11 @@
 			<tr>
 			
 				<td colspan="2">
-					<button type="submit">삭제하기</button>
+					<button type="submit" class="btn btn-secondary">삭제하기</button>
 				</td>
 			</tr>
 		</table>
 	</form>
+	</div>
 </body>
 </html>

@@ -1,8 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.Connection" %>
-<%@ page import="java.sql.DriverManager" %>
-<%@ page import="java.sql.PreparedStatement" %>
-<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="java.util.*" %>
+<%@ page import="vo.*" %>
 
 <%
 	// 요청 분석(currentPage, ...)
@@ -33,7 +32,7 @@
 	Connection conn = DriverManager.getConnection("jdbc:mariadb://127.0.0.1:3306/diary","root","java1234");
 
 	//내가보낸 문자열 모양의 쿼리를 mariadb가 실행 가능한 쿼리 형태로 변환
-	PreparedStatement stmt = conn.prepareStatement("select notice_no,notice_title, createdate from notice order by createdate desc limit ?,?");
+	PreparedStatement stmt = conn.prepareStatement("select notice_no noticeNo,notice_title noticeTitle, createdate from notice order by createdate desc limit ?,?");
 	
 	//sql문의 ?값 출력
 	stmt.setInt(1,startRow);
@@ -55,6 +54,16 @@
 		lastPage=lastPage+1;
 	}
 	
+	//자료구조 ResultSet 타입을 일반적인 자료구조타입(자바 배열or 기본API 자료구조 타입 List, Set, Map)
+	// ResultSet -. ArrayList<Notice>
+	ArrayList<Notice> noticeList = new ArrayList<Notice>();
+	while(rs.next()) {
+		Notice n = new Notice();
+		n.noticeTitle = rs.getString("noticeTitle");
+		n.noticeNo = rs.getInt("noticeNo");
+		n.createdate = rs.getString("createdate");
+		noticeList.add(n);
+	}
 %>
 <!DOCTYPE html>
 <html>
@@ -66,10 +75,14 @@
 <style>
 	a{
 		text-decoration: none;
+		color: #FF00FF;
+		font-size: 12pt;
 	}
+	
 </style>
 </head>
 <body>
+	<div class="container">
 	<div><!-- 메인메뉴 -->
 		<a class="btn btn-secondary" href="./home.jsp">홈으로</a>
 		<a class="btn btn-secondary" href="./noticeList.jsp">공지 리스트</a>
@@ -77,25 +90,25 @@
 	</div>
 	<h1>공지사항 리스트</h1>
 	
-	<a href="./insertNoticeForm.jsp">공지입력</a>
+	<a class="btn btn-secondary" href="./insertNoticeForm.jsp">공지입력</a>
 	
 	<table class="table table-striped">
 		<tr>
-			<th>notice_no</th>
-			<th>notice_title</th>
+			<th style="width:200px;">notice_no</th>
+			<th style="width:800px;">notice_title</th>
 			<th>createdate</th>
 		</tr>
 		<%
-			while(rs.next()){
+			for(Notice n : noticeList) {
 		%>
 			<tr>
-				<td><%=rs.getInt("notice_no") %></td>
+				<td><%=n.noticeNo %></td>
 				<td>
-					<a class="text-dark" href="./noticeOne.jsp?noticeNo=<%=rs.getInt("notice_no")%>">
-					<%=rs.getString("notice_title") %>
+					<a style="color: #FF00FF;" href="./noticeOne.jsp?noticeNo=<%=n.noticeNo %>">
+					<%=n.noticeTitle %>
 					</a>
 				</td>
-				<td><%=rs.getString("createdate").substring(0,10) %></td>
+				<td><%=n.createdate.substring(0,10) %></td>
 			</tr>
 		<%
 			}
@@ -118,5 +131,6 @@
 	<%
 	}
 	%>
+	</div>
 </body>
 </html>

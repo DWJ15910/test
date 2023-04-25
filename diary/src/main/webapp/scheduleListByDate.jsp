@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import = "java.sql.*" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="java.util.*" %>
+<%@ page import="vo.*" %>
 <%
 	//y,m,d 값이 null or "'-> redrection
 	if(request.getParameter("y")==null
@@ -36,11 +38,24 @@
 	Class.forName("org.mariadb.jdbc.Driver");
 	Connection conn = DriverManager.getConnection("jdbc:mariadb://127.0.0.1:3306/diary","root","java1234");
 	//sql구문
-	String sql = "select * from schedule where schedule_date=? order by schedule_time ASC";
+	String sql = "select schedule_no scheduleNo,schedule_date scheduleDate,schedule_time scheduleTime,schedule_memo scheduleMemo,schedule_color scheduleColor,createdate,updatedate from schedule where schedule_date=? order by schedule_time ASC";
 	PreparedStatement stmt = conn.prepareStatement(sql);
 	stmt.setString(1,y+"-"+m+"-"+d);
 	
 	ResultSet rs = stmt.executeQuery();
+	
+	ArrayList<Schedule> scheduleList = new ArrayList<Schedule>();
+	while(rs.next()){
+		Schedule s = new Schedule();
+		s.scheduleNo = rs.getInt("scheduleNo");
+		s.scheduleDate = rs.getString("scheduleDate");
+		s.scheduleTime = rs.getString("scheduleTime");
+		s.scheduleMemo = rs.getString("scheduleMemo");
+		s.scheduleColor = rs.getString("scheduleColor");
+		s.createdate = rs.getString("createdate");
+		s.updatedate = rs.getString("updatedate");
+		scheduleList.add(s);
+	}
 %>
 <!DOCTYPE html>
 <html>
@@ -51,6 +66,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
+	<div class="container">
+	<a href="./scheduleList.jsp" class="btn btn-secondary">홈으로</a>
 	<h1>스케줄 입력</h1>
 	<form action="./insertScheduleAction.jsp" method="post">
 		<table class="table table-striped">
@@ -99,41 +116,41 @@
 	</form>
 	<h1><%=y %>년<%=m %>월<%=d %>일 스케쥴 목록</h1>
 		<%
-			while(rs.next()){
+			for(Schedule s : scheduleList){
 		%>
-		<table class="table table-striped" style="width: 50%;">
+		<table class="table table-striped">
 		<tr>
 			<th style="width: 20%;">schedule_no</th>
-			<td><%=rs.getString("schedule_no") %></td>
+			<td><%=s.scheduleNo%></td>
 		</tr>
 		<tr>
 			<th>schedule_date</th>
-			<td><%=rs.getString("schedule_date") %></td>
+			<td><%=s.scheduleDate%></td>
 		</tr>
 		<tr>
 			<th>schedule_time</th>
-			<td><%=rs.getString("schedule_time") %></td>
+			<td><%=s.scheduleTime%></td>
 		</tr>
 		<tr>
 			<th>schedule_memo</th>
-			<td><%=rs.getString("schedule_memo") %></td>
+			<td><%=s.scheduleMemo%></td>
 		</tr>
 		<tr>
 			<th>schedule_color</th>
-			<td><%=rs.getString("schedule_color") %></td>
+			<td><%=s.scheduleColor%></td>
 		</tr>
 		<tr>
 			<th>createdate</th>
-			<td><%=rs.getString("createdate") %></td>
+			<td><%=s.createdate%></td>
 		</tr>
 		<tr>
 			<th>updatedate</th>
-			<td><%=rs.getString("updatedate") %></td>
+			<td><%=s.updatedate%></td>
 		</tr>
 		<tr>
 			<td colspan="2">
-				<a href="./updateScheduleForm.jsp?scheduleNo=<%=rs.getInt("schedule_no")%>">수정</a>
-				<a href="./deleteScheduleForm.jsp?scheduleNo=<%=rs.getInt("schedule_no")%>">삭제</a>
+				<a href="./updateScheduleForm.jsp?scheduleNo=<%=s.scheduleNo%>" class="btn btn-secondary">수정</a>
+				<a href="./deleteScheduleForm.jsp?scheduleNo=<%=s.scheduleNo%>" class="btn btn-secondary">삭제</a>
 			</td>
 		</tr>
 			</table>
@@ -141,6 +158,6 @@
 		<%
 			}
 		%>
-
+	</div>
 </body>
 </html>

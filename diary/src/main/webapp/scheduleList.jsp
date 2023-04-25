@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
 <%@ page import="java.util.*" %>
+<%@ page import="vo.*" %>
 <%
 	int targetYear = 0;
 	int targetMonth = 0;
@@ -75,7 +77,27 @@
 	int totalTd = startBlank + lastDate + endBlank;
 	System.out.println("scheduleList.totalTd-->" + totalTd);
 	
+	// DB data를 가져오는 알고리즘
+	Class.forName("org.mariadb.jdbc.Driver");
+	Connection conn = DriverManager.getConnection("jdbc:mariadb://127.0.0.1:3306/diary","root","java1234");
+	//sql구문
+	String sql = "select schedule_no scheduleNo, substr(schedule_memo,1,5) scheduleMemo,schedule_color scheduleColor,day(schedule_date) scheduleDate from schedule where year(schedule_date)=? and month(schedule_date)=? order by month(schedule_date) asc";
+	PreparedStatement stmt = conn.prepareStatement(sql);
+	stmt.setInt(1,targetYear);
+	stmt.setInt(2,targetMonth+1);
 	
+	ResultSet rs = stmt.executeQuery();
+	
+	// ResultSet - > ArrayList<Schedule> 
+	ArrayList<Schedule> scheduleList = new ArrayList<Schedule>();
+	while(rs.next()){
+		Schedule s = new Schedule();
+		s.scheduleNo = rs.getInt("scheduleNo");
+		s.scheduleDate = rs.getString("scheduleDate");// 전체날짜가 아닌 일(day)만
+		s.scheduleMemo = rs.getString("scheduleMemo");//전체가 아닌 5글자만 
+		s.scheduleColor = rs.getString("scheduleColor");
+		scheduleList.add(s);
+	}
 %>
 <!DOCTYPE html>
 <html>
@@ -84,8 +106,24 @@
 <title>Insert title here</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+	td {
+		padding: 10px;
+		width: 10%;
+	}
+	tr {
+		height: 150px;
+	}
+	a{
+		text-decoration: none;
+		color: #000000;
+		font-size: 12pt;
+		font-weight: bold;
+	}
+</style>
 </head>
-<body>
+<body>	
+	<div class="container">
 	<div><!-- 메인메뉴 -->
 		<a class="btn btn-secondary" href="./home.jsp">홈으로</a>
 		<a class="btn btn-secondary" href="./noticeList.jsp">공지 리스트</a>
@@ -98,7 +136,7 @@
 	</div>
 	
 	<table class="table table-striped">
-		<tr>
+		<tr style="height:50px;">
 			<th>일</th>
 			<th>월</th>
 			<th>화</th>
@@ -130,7 +168,21 @@
 						}
 			%>
 						<td style="<%=tdStyle%>">
-							<a href="./scheduleListByDate.jsp?y=<%=targetYear%>&m=<%=targetMonth%>&d=<%=dateNum%>"><%=dateNum%></a>
+							<div><!-- 날짜 숫자 -->
+								<a href="./scheduleListByDate.jsp?y=<%=targetYear%>&m=<%=targetMonth%>&d=<%=dateNum%>"><%=dateNum%></a>
+							</div>
+							<div><!-- 일정 memo(5글자만) -->
+								<%
+									for(Schedule s : scheduleList){
+										if(dateNum == Integer.parseInt(s.scheduleDate)){
+								%>
+										<div style="color:<%=s.scheduleColor%>"><%=s.scheduleMemo %></div>
+								<%
+										}
+									}
+								%>
+							</div>
+							
 						</td>
 			<%
 					
@@ -149,5 +201,6 @@
 			%>
 		</tr>
 	</table>
+	</div>
 </body>
 </html>

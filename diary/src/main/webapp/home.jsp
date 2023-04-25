@@ -3,6 +3,8 @@
 <%@ page import="java.sql.DriverManager" %>
 <%@ page import="java.sql.PreparedStatement" %>
 <%@ page import="java.sql.ResultSet" %>
+<%@ page import="vo.*" %>
+<%@ page import="java.util.*" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,8 +12,16 @@
 <title>Insert title here</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+	a{
+		text-decoration: none;
+		color: #FF00FF;
+		font-size: 12pt;
+	}
+</style>
 </head>
 <body>
+	<div class="container">
 	<div><!-- 메인메뉴 -->
 		<a class="btn btn-secondary" href="./home.jsp">홈으로</a>
 		<a class="btn btn-secondary" href="./noticeList.jsp">공지 리스트</a>
@@ -32,8 +42,8 @@
 		// 주소,사용자id,사용자pw
 		// 주소는 프로토콜,ip주소or도메인,포트넘버
 		
-		String sql1 = "select notice_no,notice_title, createdate from notice order by createdate desc limit 0,5";
-		String sql2 = "select schedule_no, schedule_date, schedule_time, substr(schedule_memo,1,10) memo from schedule where schedule_date = curdate() order by schedule_time";
+		String sql1 = "select notice_no noticeNo,notice_title noticeTitle, createdate from notice order by createdate desc limit 0,5";
+		String sql2 = "select schedule_no scheduleNo, schedule_date scheduleDate, schedule_time scheduleTime, substr(schedule_memo,1,10) scheduleMemo from schedule where schedule_date = curdate() order by schedule_time";
 		PreparedStatement stmt1 = conn.prepareStatement(sql1);
 		PreparedStatement stmt2 = conn.prepareStatement(sql2);
 		//내가보낸 문자열 모양의 쿼리를 mariadb가 실행 가능한 쿼리 형태로 변환
@@ -43,25 +53,44 @@
 		
 		ResultSet rs1 = stmt1.executeQuery();
 		ResultSet rs2 = stmt2.executeQuery();
+		
+		ArrayList<Notice> noticeList = new ArrayList<Notice>();
+		while(rs1.next()) {
+			Notice n = new Notice();
+			n.noticeTitle = rs1.getString("noticeTitle");
+			n.noticeNo = rs1.getInt("noticeNo");
+			n.createdate = rs1.getString("createdate");
+			noticeList.add(n);
+		}
+		
+		ArrayList<Schedule> scheduleList = new ArrayList<Schedule>();
+		while(rs2.next()){
+			Schedule s = new Schedule();
+			s.scheduleNo = rs2.getInt("scheduleNo");
+			s.scheduleDate = rs2.getString("scheduleDate");
+			s.scheduleTime = rs2.getString("scheduleTime");
+			s.scheduleMemo = rs2.getString("scheduleMemo");//10글자만출력
+			scheduleList.add(s);
+		}
 	%>
 	<h1>공지사항</h1>
 	<table class="table table-striped">
 		<tr>
-			<th>notice_no</th>
-			<th>notice_title</th>
+			<th style="width:200px;">notice_no</th>
+			<th style="width:800px;">notice_title</th>
 			<th>createdate</th>
 		</tr>
 		<%
-			while(rs1.next()){
+			for(Notice n : noticeList){
 		%>
 			<tr>
-				<td><%=rs1.getInt("notice_no") %></td>
+				<td><%=n.noticeNo %></td>
 				<td>
-					<a href="./noticeOne.jsp?noticeNo=<%=rs1.getInt("notice_no")%>">
-					<%=rs1.getString("notice_title") %>
+					<a href="./noticeOne.jsp?noticeNo=<%=n.noticeNo%>">
+					<%=n.noticeTitle%>
 					</a>
 				</td>
-				<td><%=rs1.getString("createdate").substring(0,10) %></td>
+				<td><%=n.createdate.substring(0,10) %></td>
 			</tr>
 		<%
 			}
@@ -70,23 +99,23 @@
 	<h1>오늘일정</h1>
 	<table class="table table-striped">
 		<tr>
-			<th>schedule_date</th>
-			<th>schedule_time</th>
+			<th style="width:200px;">schedule_date</th>
+			<th style="width:200px;">schedule_time</th>
 			<th>schedule_memo</th>
 		</tr>
 		<%
-			while(rs2.next()){
+			for(Schedule s : scheduleList){
 		%>
 			<tr>
 				<td>
-					<%=rs2.getString("schedule_date") %>
+					<%=s.scheduleDate %>
 				</td>
 				<td>
-					<%=rs2.getString("schedule_time") %>
+					<%=s.scheduleTime%>
 				</td>
 				<td>	
-					<a href="./scheduleOne.jsp?scheduleNo=<%=rs2.getInt("schedule_no")%>">
-						<%=rs2.getString("memo")%>
+					<a href="./scheduleListByDate.jsp?">
+						<%=s.scheduleMemo%>
 					</a>
 				</td>
 			</tr>
@@ -94,5 +123,6 @@
 			}
 		%>
 	</table>
+	</div>
 </body>
 </html>
