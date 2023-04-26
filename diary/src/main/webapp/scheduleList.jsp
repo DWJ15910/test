@@ -109,9 +109,14 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <style>
 	td {
-		padding: 10px;
 		width: 10%;
-		height: 150px;
+		height: 110px;
+		overflow: hidden;
+		position: relative;
+	}
+	.con {
+		position: absolute;
+		padding-bottom: 30px;
 	}
 	a{
 		text-decoration: none;
@@ -120,9 +125,7 @@
 		font-weight: bold;
 	}
 	.asdf {/* 표시할 텍스트 줄 수 */
-		overflow: hidden;
-		text-overflow: ellipsis; 
-		 white-space: nowrap;
+		
 	}
 </style>
 </head>
@@ -177,7 +180,9 @@
 								
 						}
 			%>
-						<td style="<%=tdStyle%>">
+						
+						<td class="asdf" style="<%=tdStyle%>">
+						<div class="con">
 							<div><!-- 날짜 숫자 -->
 								<a href="./scheduleListByDate.jsp?y=<%=targetYear%>&m=<%=targetMonth%>&d=<%=dateNum%>"><%=dateNum%></a>
 							</div>
@@ -187,12 +192,13 @@
 										if(dateNum == Integer.parseInt(s.scheduleDate)){		
 											
 								%>
-										<div class="asdf" style="color:<%=s.scheduleColor%>"><%=s.scheduleMemo %></div>
+										<div style="color:<%=s.scheduleColor%>"><%=s.scheduleMemo %></div>
 								<%
 										}
 									}
 								%>
 							</div>
+						</div>
 							
 						</td>
 			<%

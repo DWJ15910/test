@@ -127,14 +127,18 @@
 		%>
 	</table>
 	<br>
+	<h2>사용언어</h2>
+	<div>JAVA</div>
+	<h2>사용 프로그램</h2>
+	<div>Eclipse,HeidSQL</div>
 	<h2>사용기술</h2>
 	<div>1. html</div>
 	<div>2. css bootstrap</div>
 	<div>3. java ArrayList를 통해서 rs.next를 교체</div>
 	<div>4. MariaDB 와 연동하여 공지사항 리스트 추가</div>
-	<div>5. 공지사항의 삽입, 삭제, 수정이 가능함</div>
+	<div>5. 공지사항의 삽입, 삭제, 수정</div>
 	<div>6. 스케쥴 일정 달력 추가</div>
-	<div>7. 달력 날짜를 누른 뒤 삽입, 삭제, 수정이 가능함</div>
+	<div>7. 달력 날짜를 누른 뒤 삽입, 삭제, 수정</div>
 	</div>
 </body>
 </html>
