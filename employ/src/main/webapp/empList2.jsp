@@ -10,6 +10,59 @@
 	final String BLUE = "\u001B[44m"; // 리스트,날짜 관련
 	//-----------------------------------------------utf8인코딩-------------------------------------------------
 	request.setCharacterEncoding("utf8");	
+	
+	//-----------------------------------------------나이대구하기--------------------------------------------------
+	//오늘 날짜 데이터 구하기
+	Calendar today = Calendar.getInstance();
+	System.out.println(BLUE+"empList2.today -->" + today);
+	
+	//오늘 날짜의 년,월,일 구하기
+	int todayYear = today.get(Calendar.YEAR);
+	int todayMonth = today.get(Calendar.MONTH)+1;
+	int todayDay = today.get(Calendar.DATE);
+	//오늘 날짜 디버깅
+	System.out.println(BLUE+"empList2.todayYear -->" + todayYear);
+	System.out.println(BLUE+"empList2.todayMonth -->" + todayMonth);
+	System.out.println(BLUE+"empList2.todayDay -->" + todayDay);
+	
+	String[] ageBox = request.getParameterValues("ageBox");
+	int ageBoxCk[] = null;
+
+	//ageBox의 값을 받아 왔을때
+	if(ageBox != null){
+		//ageBox의 길이만큼 intAgeBox의 배열이 만들어진다
+		ageBoxCk = new int[ageBox.length];
+			//그리고 ageBox배열[]번째의 값을 intAgeBox[]번째에 넣어준다
+			for(int i =0; i<ageBox.length; i++){
+				ageBoxCk[i] = Integer.parseInt(ageBox[i]);
+			}//for문닫기
+	}//if문닫기
+	
+	
+	int testS = 0;
+	int testS2 = 0;
+	int testS2[] = null;
+	if(ageBox != null){
+		for(int i = 0; i<ageBox.length; i++){
+		String ageYearS = String.valueOf(todayYear - ageBoxCk[i]);
+		String ageMonthS = String.format("%02d", todayMonth);
+		String ageDateS = String.format("%02d", todayDay);
+		String test1 = ageYearS + ageMonthS + ageDateS;
+		testS = Integer.parseInt(test1);
+		System.out.println("testS-->"+testS);
+		
+		String ageYearS2[i] = String.valueOf(todayYear - ageBoxCk[i]-10);
+		String ageMonthS2[i] = String.format("%02d", todayMonth);
+		String ageDateS2[i] = String.format("%02d", todayDay+1);
+		String test2 = ageYearS2 + ageMonthS2 + ageDateS2;
+		testS2[] = Integer.parseInt(test2);
+		System.out.println("testS2-->"+testS2);
+		}
+	}
+	
+	
+	System.out.println("today합치기-->"+testS);
+	System.out.println("today2합치기-->"+testS2);
 
 	//------------------------------------------------페이지설정-------------------------------------------------
 	//기본 페이지 설정
@@ -39,7 +92,7 @@
 	Connection conn = DriverManager.getConnection(dbUrl,dbId,dbPw);
 	System.out.println(YELLOW+"empList DB 로그인확인");
 
-	//-----------------------------------------------쿼리에 쓸 변수 작성-----------------------------------------------
+	//-----------------------------------------------유효성 검사-----------------------------------------------
 	//null값이 둘다 아닐경우에 값을 대입해주기
 	//gender와 name 둘다 공백 선언
 	String gender = "";//성별 검색했을때 받는 곳
@@ -64,52 +117,60 @@
 		System.out.println(GREEN+"hireSecond이 null이 아닙니다");
 	}
 	//input radio로 받아온 value값을 바탕으로 sql문 분기 작성
+	String[] ckMonth = request.getParameterValues("ckMonth");
+	int[] intCkMonth = null;
+	if(ckMonth !=null){
+		intCkMonth = new int[ckMonth.length];
+			for(int i = 0; i<ckMonth.length; i++){
+				intCkMonth[i] = Integer.parseInt(ckMonth[i]);
+			}//
+	}
+		
+	//----------------------------------------------검색용 쿼리문 작성------------------------------------------------------
 	
-	//input checkbox에서 받아온 값을 스트링으로 저장
-	String[] ageBox = request.getParameterValues("ageBox");
-	//ageBox의 값을 int로 저장해줄 int타입의 배열선언
-	int[] intAgeBox = null;
+	String hireQuery = "AND MONTH(hire_date)";
+	//고용얼 구하기용 sql문 작성
+	String hireQuery2 = "";
+	//intCkMonth가 null이나ㅣ고 0보다클때
+	if(intCkMonth != null && intCkMonth.length > 0){
+		//sql문에 in( 생성
+	    hireQuery2 = hireQuery+" in (";
+	    //intAgeBox의[0]번째 배열 값부터 차례대로 넣어준다
+	    for(int i = 0; i < intCkMonth.length; i++){
+	    	hireQuery2 += intCkMonth[i];
+	        //배열 값을 넣어주면서 마지막 번호전까지는 뒤에 쉼표도 붙여준다 ex)i가1이고 intCkMonth.length가 2일때 , 는 나오지 않는다
+	        if(i != intCkMonth.length - 1){
+	        	hireQuery2 += ",";
+	        }
+	    }
+	    //모든 값 삽입이 끝나면 )를 닫아서 완성한다
+	    hireQuery2 += ")";
+	}
 	
-	//ageBox의 값을 받아 왔을때
-	if(ageBox != null){
-		//ageBox의 길이만큼 intAgeBox의 배열이 만들어진다
-		intAgeBox = new int[ageBox.length];
-			//그리고 ageBox배열[]번째의 값을 intAgeBox[]번째에 넣어준다
-			for(int i =0; i<ageBox.length; i++){
-			intAgeBox[i] = Integer.parseInt(ageBox[i]);
-			}//for문닫기
-	}//if문닫기
 	
 	//나이대 구하기용 sql문 작성
 	String ageQuery2 = "";
 	//intAgeBox가 null이 아니고 0보다 클때
-	if(intAgeBox != null && intAgeBox.length > 0){
+	if(ageBoxCk != null && ageBoxCk.length > 0){
+		for(int i = 0; i<ageBoxCk.length; i++){
 		//sql문에 in( 생성
-	    ageQuery2 = "in (";
+	    ageQuery2 += 
+		System.out.println("testS --> "+testS);
+		System.out.println("testS --> "+testS2);
 	    //intAgeBox의[0]번째 배열 값부터 차례대로 넣어준다
-	    for(int i = 0; i < intAgeBox.length; i++){
-	        ageQuery2 += intAgeBox[i];
-	        //배열 값을 넣어주면서 마지막 번호전까지는 뒤에 쉼표도 붙여준다
-	        if(i != intAgeBox.length - 1){
-	            ageQuery2 += ",";
-	        }
-	    }
-	    //모든 값 삽입이 끝나면 )를 닫아서 완성한다
-	    ageQuery2 += ")";
+		}
 	}
-	
-	//----------------------------------------------쿼리문 작성------------------------------------------------------
+
 	//sql1을 기본 값으로 null 선언
 	String sql1 = null;
 	//stmt를 null값 선언(stmt가 내부 선언되어 다시 쓰기 위해 바깥에서 선언)
 	PreparedStatement stmt = null;
-	//SQL에서 YEAR만 출력하는 상태로 현재날짜-생일을 뺀 뒤 생일이 지나지 않았다면 -1을 하고, 나온 나이 값 중 앞부분만 출력
-	String ageQuery = "LEFT(CASE WHEN MONTH(birth_date) > MONTH(CURDATE()) OR (MONTH(birth_date) = MONTH(CURDATE()) AND DAY(birth_date) > DAY(CURDATE())) THEN YEAR(CURDATE()) - YEAR(birth_date) - 1 ELSE YEAR(CURDATE()) - YEAR(birth_date) END,1)";
-	//SQL에서 YEAR만 출력하는 상태로 현재날짜-생일을 뺀 뒤 생일이 지나지 않았다면 -1을 하고, 나온 나이 값 중 앞부분만 출력하는대 그앞에 유동적으로 사용할 수 있도록 AND 추가
-	String ageQueryAnd = "AND LEFT(CASE WHEN MONTH(birth_date) > MONTH(CURDATE()) OR (MONTH(birth_date) = MONTH(CURDATE()) AND DAY(birth_date) > DAY(CURDATE())) THEN YEAR(CURDATE()) - YEAR(birth_date) - 1 ELSE YEAR(CURDATE()) - YEAR(birth_date) END,1)";
 	
+	//SQL에서 YEAR만 출력하는 상태로 현재날짜-생일을 뺀 뒤 생일이 지나지 않았다면 -1을 하고, 나온 나이 값 중 앞부분만 출력
+	
+	//검색 리스트 구하기 SQL문 작성
 	//성별, 이름, 고용일, 나이대 모두 공백일 경우 기본 리스트를 실행한다
-	if(gender.equals("") && name.equals("") && (hireFirst.equals("") && hireSecond.equals("") && ageQuery.equals(""))){
+	if(gender.equals("") && name.equals("") && (hireFirst.equals("") && hireSecond.equals("") && ageQuery2.equals(""))){
 		sql1 = "SELECT emp_no,birth_date,first_name,last_name,gender,hire_date FROM employees LIMIT ?, ?";
 		//해당 쿼리문을 DB에서 실행가능하도록 교체
 		stmt = conn.prepareStatement(sql1);
@@ -121,15 +182,15 @@
 	//입사년도 검색이 공백 일경우 실행 되는 sql문
 	}else{
 		//성별, 이름, 고용일, 나이대 중 하나라도 검색할 경우 리스트에서 검색하여 실행한다
-		sql1 = "SELECT emp_no,birth_date,first_name,last_name,gender,hire_date," +
-				ageQuery+
-				" FROM employees "+
+		sql1 = "SELECT emp_no,birth_date,first_name,last_name,gender,hire_date" +
+				" FROM employees"+
 				" where gender like ? "+
 				" and concat(first_name,' ',last_name) like ? "+
-				ageQueryAnd+
 				ageQuery2+
+				hireQuery2+
 				" AND YEAR(hire_date) BETWEEN ? AND ? "+
 				" LIMIT ?, ?";
+		
 		//해당 쿼리문을 DB에서 실행가능하도록 교체
 		stmt = conn.prepareStatement(sql1);
 		//?값 넣기
@@ -143,19 +204,17 @@
 	    System.out.println(GREEN+"SQL쿼리문 실행 타입 2");
 	}
 	
-	//sql1을 기본 값으로 null 선언
+	//---------------------------------------------------토탈 행 구하기 쿼리문 작성-----------------------------------------
+	//sql2 null선언 sql는 total 행의 갯수를 얻기 위해 실행한다
 		String sql2 = null;
-		//stmt를 null값 선언(stmt가 내부 선언되어 다시 쓰기 위해 바깥에서 선언)
+		//stmt2를 null값 선언(stmt가 내부 선언되어 다시 쓰기 위해 바깥에서 선언)
 		PreparedStatement stmt2 = null;
 		
 		//성별, 이름, 고용일, 나이대 모두 공백일 경우 기본 리스트를 실행한다
-		if(gender.equals("") && name.equals("") && (hireFirst.equals("") && hireSecond.equals("") && ageQuery.equals(""))){
+		if(gender.equals("") && name.equals("") && (hireFirst.equals("") && hireSecond.equals("") && ageQuery2.equals(""))){
 			sql2 = "SELECT count(*) FROM employees";
 			//해당 쿼리문을 DB에서 실행가능하도록 교체
 			stmt2 = conn.prepareStatement(sql1);
-			//?값 넣기
-			stmt2.setInt(1, startrow);
-		    stmt2.setInt(2, rowperPage);
 		    //SQL쿼리문 실행 타입 확인 디버깅
 			System.out.println(GREEN+"SQL쿼리문 실행 타입 3");
 		//입사년도 검색이 공백 일경우 실행 되는 sql문
@@ -165,10 +224,9 @@
 					" FROM employees "+
 					" where gender like ? "+
 					" and concat(first_name,' ',last_name) like ? "+
-					ageQueryAnd+
 					ageQuery2+
-					" AND YEAR(hire_date) BETWEEN ? AND ? "+
-					" LIMIT ?, ?";
+					hireQuery2+
+					" AND YEAR(hire_date) BETWEEN ? AND ? ";
 			//해당 쿼리문을 DB에서 실행가능하도록 교체
 			stmt2 = conn.prepareStatement(sql2);
 			//?값 넣기
@@ -176,12 +234,11 @@
 		    stmt2.setString(2,"%"+name+"%");
 		    stmt2.setString(3, hireFirst);
 		    stmt2.setString(4, hireSecond);
-		    stmt2.setInt(5, startrow);
-		    stmt2.setInt(6, rowperPage);
 		  //SQL쿼리문 실행 타입 확인 디버깅
 		    System.out.println(GREEN+"SQL쿼리문 실행 타입 4");
 		}
 	
+	//---------------------------------------------------------쿼리문 디버깅 및 rs값 구하기--------------------------------
 	//STMT 디버깅
 	System.out.println(GREEN+"empList2.stmt-->" + stmt);
 	System.out.println(GREEN+"empList2.stmt2-->" + stmt2);
@@ -227,18 +284,7 @@
 	System.out.println(RED+"empList2.lastPage-->" + lastPage);
 	
 	//-------------------------------------------------------나이 구하기-----------------------------------------------
-	//오늘 날짜 데이터 구하기
-	Calendar today = Calendar.getInstance();
-	System.out.println(BLUE+"empList2.today -->" + today);
 	
-	//오늘 날짜의 년,월,일 구하기
-	int todayYear = today.get(Calendar.YEAR);
-	int todayMonth = today.get(Calendar.MONTH)+1;
-	int todayDay = today.get(Calendar.DATE);
-	//오늘 날짜 디버깅
-	System.out.println(BLUE+"empList2.todayYear -->" + todayYear);
-	System.out.println(BLUE+"empList2.todayMonth -->" + todayMonth);
-	System.out.println(BLUE+"empList2.todayDay -->" + todayDay);
 	
 	//age를 배열형태로 저장하기 위해 forreach 문 선언
 	for(Employ e : employList){
@@ -247,6 +293,8 @@
 	int birthYear = Integer.parseInt(e.birthDate.substring(0,4));
 	int birthMonth = Integer.parseInt(e.birthDate.substring(5,7));
 	int birthDay = Integer.parseInt(e.birthDate.substring(8));
+	
+	
 	e.age = todayYear-birthYear;
 	
 	//생일이 지났으면 현재년도-생년
@@ -258,13 +306,45 @@
 				e.age = todayYear-birthYear;
 			}
 	}
+	
+	//---------------------------------------------------------페이징 설정-------------------------------------------------------
+	
+	//변수를 하나 선언해준 뒤 검색해준 항목이 있을때만 해당 항목을 변수에 추가 선언하여 출력
+	String queryString = "";
+	//gender가 null이나 공백이 아닐때 gender값을 주소에 추가
+	if(gender != null && !gender.equals("")) {
+		//ex)gender에서 '남'을 검색하면 &gender=M 출력
+		queryString += "&gender=" + gender;
+	}//gender If문 닫기
+	//name이 null이나 공백이 아닐때 name값을 주소에 추가
+	if(name != null && !name.equals("")) {
+		queryString += "&name=" + name;
+	}//name If문 닫기
+	if(hireFirst!=null && !hireFirst.equals("")) {
+		queryString += "&hireFirst=" + hireFirst;
+	}//hireFist IF문 닫기
+	if(hireSecond !=null && !hireSecond.equals("")) {
+		queryString += "&hireSecond=" + hireSecond;
+	}//hireFist IF문 닫기
+	if(ageBox !=null && ageBox.length>0) {
+		//ageBox의 길이만큼 실행
+		for(int i = 0; i < ageBox.length; i++){
+			queryString += "&ageBox=" + ageBox[i];
+		}//for문 닫기
+	}//ageBox IF문 닫기
+	if(ckMonth !=null && ckMonth.length>0) {
+		//ckMonth의 길이만큼 실행
+		for(int i = 0; i < ckMonth.length; i++){
+			queryString += "&ckMonth=" + ckMonth[i];
+		}//for문 닫기
+	}//ckMonth IF문 닫기
 	//-----------------------------------------------------뷰---------------------------------------------------------------
 %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>직원 리스트</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <style>
@@ -280,7 +360,7 @@
 <body>
 	<div class="container">
 	<!-- 제목 -->
-	<h1 style="text-align:center; ">empList</h1>
+	<h1 style="text-align:center; ">직원 리스트</h1>
 	
 	<!-- form 열기 -->
 	<form action="./empList2.jsp">
@@ -319,31 +399,60 @@
 		<input type ="text" name="name" placeholder="이름 검색" value="<%=name%>">
 		<input type ="number" name="hireFirst" placeholder="입사년도" value="<%=hireFirst%>"> -
 		<input type ="number" name="hireSecond" placeholder="입사년도" value="<%=hireSecond%>">
+	</div><br>
+	<div style="float:right;">
+		<label>나이대: </label>
 		<%
+			//나이대 선택해서 해당 나이대에 해당하는 사람들 출력하기
 			//age의 나이대 앞자리 나열
-			int[] age = {1,2,3,4,5,6,7,8,9};
+			int[] age = {10,20,30,40,50,60,70,80,90};
 			//int a가 age배열을 참조
 			for(int a : age){
 				//기본 checked속성 fasle로 실행
 				boolean checked = false;
-				//체크해서 보낸 ageBox데이터를 다시 받아오기
-			    ageBox = request.getParameterValues("ageBox");
 				//받아온 ageBox가 null이 아닐경우에만 실행
 			    if (ageBox != null) {
 			    	//ageBox의 0번배열부터 쭉 검색
 			        for (int i = 0; i < ageBox.length; i++) {
-			        	//ageBox배열이 a와 같다면 check를 true로 변경
+			        	//ageBox배열[i]가 a와 같다면 check를 true로 변경
 			            if (ageBox[i].equals(Integer.toString(a))) {
 			                checked = true;
 			            }//if문닫기
 			        }//for문닫기
 			    }//if문닫기
 		%>	
-				<input type="checkbox" name="ageBox" <%=checked ? "checked" : "" %> value="<%=a %>"><%=a %>0대
+				<input type="checkbox" name="ageBox" <%=checked ? "checked" : "" %> value="<%=a %>"><%=a %>대
 		<%
 			}
 		%>
-		
+	</div><br>
+	<div style="float:right; padding-left:500px;">
+		<label>고용 월: </label>
+		<%
+			// 고용월 선택해서 해당고용월인 사람들 출력
+			//months의 월 나열
+			int[] months = {1,2,3,4,5,6,7,8,9,10,11,12};
+			//int m이 months배열을 참조
+			for(int m : months){
+				//기본 checked속성 fasle로 실행
+				boolean checked = false;
+				//받아온 ckMonth null이 아닐경우에만 실행
+			    if (ckMonth != null) {
+			    	//ckMonth의 0번배열부터 쭉 검색
+			        for (int i = 0; i < ckMonth.length; i++) {
+			        	//ckMonth배열이 a와 같다면 check를 true로 변경
+			            if (ckMonth[i].equals(Integer.toString(m))) {
+			                checked = true;
+			            }//if문닫기
+			        }//for문닫기
+			    }//if문닫기
+		%>	
+				<input type="checkbox" name="ckMonth" <%=checked ? "checked" : "" %> value="<%=m %>"><%=m %>월
+		<%
+			}
+		%>
+	</div><br>
+	<div style="float:right; padding-left: 800px;">
 		<!-- 정보 보내기 -->
 		<button class="btn btn-secondary" type="submit">검색</button>
 	</div><br>
@@ -416,99 +525,39 @@
 			</tbody>
 		<!-- 리스트부분 끝 -->
 		</table>
+		<%
+		//----------------------------------------------------------뷰 끝---------------------------------------------------	
+		%>
+		
 		
 		<!-- 페이지 출력부분 -->
 		<div style="text-align: center">
-		<%
+		<%//-----------------------------------------------------페이지 넘기기시작 (이전페이지부터)-----------------------------------
 			//현재페이지가 1보다 클경우만 이전 페이지로 갈수 있도록 설정
 			if(currentPage>1){
-			//페이지 뒤에 url추가 주소값을 넣기위한(검색했을때 검색정보값) 스트링 변수선언
-			String queryString = "";
-				//gender가 null이나 공백이 아닐때 gender값을 주소에 추가
-				if(gender != null && !gender.equals("")) {
-					//ex)gender에서 '남'을 검색하면 &gender=M 출력
-					queryString += "&gender=" + gender;
-				}//gender If문 닫기
-				//name이 null이나 공백이 아닐때 name값을 주소에 추가
-				if(name != null && !name.equals("")) {
-					queryString += "&name=" + name;
-				}//name IF문 닫기
-				if(hireFirst !=null && !hireFirst.equals("")) {
-					queryString += "&hireFirst=" + hireFirst;
-				}//hireFist IF문 닫기
-				if(hireSecond !=null && !hireSecond.equals("")) {
-					queryString += "&hireSecond=" + hireSecond;
-				}//hireFist IF문 닫기
-				if(ageBox !=null && ageBox.length>0) {
-					//ageBox의 길이만큼 실행
-					for(int i = 0; i < ageBox.length; i++){
-						//ageBox의 값이 공백이 아니라면 ageBox에 값 추가해주고 queryString에 추가 만약 공백이면 탈출
-						if(!ageBox[i].equals("")){
-						queryString += "&ageBox=" + ageBox[i];
-						}//if문닫기
-					}//for문닫기
-				}//ageBox IF문 닫기
-				System.out.println(RED+"queryString이전"+queryString);
 		%>
+				<!-- 이전 페이지 출력 -->
 				<a class="btn btn-primary" href="./empList2.jsp?currentPage=<%=currentPage-1%><%=queryString%>">이전</a>
 		<%
 				}//currentPage>1 IF문 닫기
+		//------------------------------------------------------이전 페이지 설정 끝----------------------------------------------
 		%>
-				<!-- 현재페이지 출력 -->
+		<!---------------------------------------------------- 현재페이지 출력 -------------------------------------------------->
 				<a class="btn btn-primary">현재페이지<%=currentPage%></a>
 		<%
+		//------------------------------------------------------다음 페이지 설정 시작---------------------------------------------
 			//현재페이지가 lastPage보다 적을 경우에만 다음페이지가 보이도록 설정
 			if(currentPage<lastPage){
-				//변수를 하나 선언해준 뒤 검색해준 항목이 있을때만 해당 항목을 변수에 추가 선언하여 출력
-				String queryString = "";
-				//gender가 null이나 공백이 아닐때 gender값을 주소에 추가
-				if(gender != null && !gender.equals("")) {
-					//ex)gender에서 '남'을 검색하면 &gender=M 출력
-					queryString += "&gender=" + gender;
-				}//gender If문 닫기
-				//name이 null이나 공백이 아닐때 name값을 주소에 추가
-				if(name != null && !name.equals("")) {
-					queryString += "&name=" + name;
-				}//name If문 닫기
-				if(hireFirst!=null && !hireFirst.equals("")) {
-					queryString += "&hireFirst=" + hireFirst;
-				}//hireFist IF문 닫기
-				if(hireSecond !=null && !hireSecond.equals("")) {
-					queryString += "&hireSecond=" + hireSecond;
-				}//hireFist IF문 닫기
-				if(ageBox !=null && ageBox.length>0) {
-					//ageBox의 길이만큼 실행
-					for(int i = 0; i < ageBox.length; i++){
-						//ageBox의 값이 공백이 아니라면 ageBox에 값 추가해주고 queryString에 추가 만약 공백이면 탈출
-						if(!ageBox[i].equals("")){
-						queryString += "&ageBox=" + ageBox[i];
-						}//if문닫기
-					}//for문 닫기
-				}//ageBox IF문 닫기
-				System.out.println(RED+"queryString다음"+queryString);
 		%>
 				<a class="btn btn-primary" href="./empList2.jsp?currentPage=<%=currentPage+1%><%=queryString%>">다음</a>
 		<%
-				//전부다 활성화 되어 있지않을 경우 페이지넘기기
-			}//currentPage닫기
+				}//currentPage닫기
+		//------------------------------------------------다음페이지 설정 끝------------------------------------------------------
 		%>
 		</div>
 		<!-- 페이지 출력분 끝 -->
 	</form>
 	<!-- form 닫기 -->
-	<!-- 검색 조건 -->
-	<table class="table table-striped" style="width:70%;">
-		<tr>
-			<th style="width:150px;">성별:</th>
-			<td style="width:150px;"><%=gender %></td>
-			<th style="width:150px;">이름:</th>
-			<td style="width:150px;"> <%=name %></td>
-			<th style="width:150px;">입사년도:</th>
-			<td><%=hireFirst %> - <%=hireSecond %></td>
-		</tr>
-	<!--  검색 조건 닫기 -->
-	</table>
-	
 	<!-- contaioner 닫기 -->
 	</div>
 </body>
