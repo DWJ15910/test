@@ -7,4 +7,5 @@ public class Employ {
 	   public String lastName;
 	   public String gender;
 	   public String hireDate;
+	   public int age;
 	}
