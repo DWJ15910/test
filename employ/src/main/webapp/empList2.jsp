@@ -10,59 +10,6 @@
 	final String BLUE = "\u001B[44m"; // 리스트,날짜 관련
 	//-----------------------------------------------utf8인코딩-------------------------------------------------
 	request.setCharacterEncoding("utf8");	
-	
-	//-----------------------------------------------나이대구하기--------------------------------------------------
-	//오늘 날짜 데이터 구하기
-	Calendar today = Calendar.getInstance();
-	System.out.println(BLUE+"empList2.today -->" + today);
-	
-	//오늘 날짜의 년,월,일 구하기
-	int todayYear = today.get(Calendar.YEAR);
-	int todayMonth = today.get(Calendar.MONTH)+1;
-	int todayDay = today.get(Calendar.DATE);
-	//오늘 날짜 디버깅
-	System.out.println(BLUE+"empList2.todayYear -->" + todayYear);
-	System.out.println(BLUE+"empList2.todayMonth -->" + todayMonth);
-	System.out.println(BLUE+"empList2.todayDay -->" + todayDay);
-	
-	String[] ageBox = request.getParameterValues("ageBox");
-	int ageBoxCk[] = null;
-
-	//ageBox의 값을 받아 왔을때
-	if(ageBox != null){
-		//ageBox의 길이만큼 intAgeBox의 배열이 만들어진다
-		ageBoxCk = new int[ageBox.length];
-			//그리고 ageBox배열[]번째의 값을 intAgeBox[]번째에 넣어준다
-			for(int i =0; i<ageBox.length; i++){
-				ageBoxCk[i] = Integer.parseInt(ageBox[i]);
-			}//for문닫기
-	}//if문닫기
-	
-	
-	int testS = 0;
-	int testS2 = 0;
-	int testS2[] = null;
-	if(ageBox != null){
-		for(int i = 0; i<ageBox.length; i++){
-		String ageYearS = String.valueOf(todayYear - ageBoxCk[i]);
-		String ageMonthS = String.format("%02d", todayMonth);
-		String ageDateS = String.format("%02d", todayDay);
-		String test1 = ageYearS + ageMonthS + ageDateS;
-		testS = Integer.parseInt(test1);
-		System.out.println("testS-->"+testS);
-		
-		String ageYearS2[i] = String.valueOf(todayYear - ageBoxCk[i]-10);
-		String ageMonthS2[i] = String.format("%02d", todayMonth);
-		String ageDateS2[i] = String.format("%02d", todayDay+1);
-		String test2 = ageYearS2 + ageMonthS2 + ageDateS2;
-		testS2[] = Integer.parseInt(test2);
-		System.out.println("testS2-->"+testS2);
-		}
-	}
-	
-	
-	System.out.println("today합치기-->"+testS);
-	System.out.println("today2합치기-->"+testS2);
 
 	//------------------------------------------------페이지설정-------------------------------------------------
 	//기본 페이지 설정
@@ -125,16 +72,30 @@
 				intCkMonth[i] = Integer.parseInt(ckMonth[i]);
 			}//
 	}
-		
+	
+	//input checkbox에서 받아온 값을 스트링으로 저장
+	String[] ageBox = request.getParameterValues("ageBox");
+	//ageBox의 값을 int로 저장해줄 int타입의 배열선언
+	int[] intAgeBox = null;
+	
+	//ageBox의 값을 받아 왔을때
+	if(ageBox != null){
+		//ageBox의 길이만큼 intAgeBox의 배열이 만들어진다
+		intAgeBox = new int[ageBox.length];
+			//그리고 ageBox배열[]번째의 값을 intAgeBox[]번째에 넣어준다
+			for(int i =0; i<ageBox.length; i++){
+			intAgeBox[i] = Integer.parseInt(ageBox[i]);
+			}//for문닫기
+	}//if문닫기
+	
 	//----------------------------------------------검색용 쿼리문 작성------------------------------------------------------
 	
-	String hireQuery = "AND MONTH(hire_date)";
 	//고용얼 구하기용 sql문 작성
 	String hireQuery2 = "";
 	//intCkMonth가 null이나ㅣ고 0보다클때
 	if(intCkMonth != null && intCkMonth.length > 0){
 		//sql문에 in( 생성
-	    hireQuery2 = hireQuery+" in (";
+	    hireQuery2 = "in (";
 	    //intAgeBox의[0]번째 배열 값부터 차례대로 넣어준다
 	    for(int i = 0; i < intCkMonth.length; i++){
 	    	hireQuery2 += intCkMonth[i];
@@ -151,26 +112,33 @@
 	//나이대 구하기용 sql문 작성
 	String ageQuery2 = "";
 	//intAgeBox가 null이 아니고 0보다 클때
-	if(ageBoxCk != null && ageBoxCk.length > 0){
-		for(int i = 0; i<ageBoxCk.length; i++){
+	if(intAgeBox != null && intAgeBox.length > 0){
 		//sql문에 in( 생성
-	    ageQuery2 += 
-		System.out.println("testS --> "+testS);
-		System.out.println("testS --> "+testS2);
+	    ageQuery2 = "in (";
 	    //intAgeBox의[0]번째 배열 값부터 차례대로 넣어준다
-		}
+	    for(int i = 0; i < intAgeBox.length; i++){
+	        ageQuery2 += intAgeBox[i];
+	        //배열 값을 넣어주면서 마지막 번호전까지는 뒤에 쉼표도 붙여준다
+	        if(i != intAgeBox.length - 1){
+	            ageQuery2 += ",";
+	        }
+	    }
+	    //모든 값 삽입이 끝나면 )를 닫아서 완성한다
+	    ageQuery2 += ")";
 	}
-
-	//sql1을 기본 값으로 null 선언
+//sql1을 기본 값으로 null 선언
 	String sql1 = null;
 	//stmt를 null값 선언(stmt가 내부 선언되어 다시 쓰기 위해 바깥에서 선언)
 	PreparedStatement stmt = null;
-	
+	String hireQuery = "AND MONTH(hire_date)";
 	//SQL에서 YEAR만 출력하는 상태로 현재날짜-생일을 뺀 뒤 생일이 지나지 않았다면 -1을 하고, 나온 나이 값 중 앞부분만 출력
+	String ageQuery = "LEFT(CASE WHEN MONTH(birth_date) > MONTH(CURDATE()) OR (MONTH(birth_date) = MONTH(CURDATE()) AND DAY(birth_date) > DAY(CURDATE())) THEN YEAR(CURDATE()) - YEAR(birth_date) - 1 ELSE YEAR(CURDATE()) - YEAR(birth_date) END,1)";
+	//SQL에서 YEAR만 출력하는 상태로 현재날짜-생일을 뺀 뒤 생일이 지나지 않았다면 -1을 하고, 나온 나이 값 중 앞부분만 출력하는대 그앞에 유동적으로 사용할 수 있도록 AND 추가
+	String ageQueryAnd = "AND LEFT(CASE WHEN MONTH(birth_date) > MONTH(CURDATE()) OR (MONTH(birth_date) = MONTH(CURDATE()) AND DAY(birth_date) > DAY(CURDATE())) THEN YEAR(CURDATE()) - YEAR(birth_date) - 1 ELSE YEAR(CURDATE()) - YEAR(birth_date) END,1)";
 	
 	//검색 리스트 구하기 SQL문 작성
 	//성별, 이름, 고용일, 나이대 모두 공백일 경우 기본 리스트를 실행한다
-	if(gender.equals("") && name.equals("") && (hireFirst.equals("") && hireSecond.equals("") && ageQuery2.equals(""))){
+	if(gender.equals("") && name.equals("") && (hireFirst.equals("") && hireSecond.equals("") && ageQuery.equals(""))){
 		sql1 = "SELECT emp_no,birth_date,first_name,last_name,gender,hire_date FROM employees LIMIT ?, ?";
 		//해당 쿼리문을 DB에서 실행가능하도록 교체
 		stmt = conn.prepareStatement(sql1);
@@ -182,11 +150,14 @@
 	//입사년도 검색이 공백 일경우 실행 되는 sql문
 	}else{
 		//성별, 이름, 고용일, 나이대 중 하나라도 검색할 경우 리스트에서 검색하여 실행한다
-		sql1 = "SELECT emp_no,birth_date,first_name,last_name,gender,hire_date" +
-				" FROM employees"+
+		sql1 = "SELECT emp_no,birth_date,first_name,last_name,gender,hire_date," +
+				ageQuery+
+				" FROM employees "+
 				" where gender like ? "+
 				" and concat(first_name,' ',last_name) like ? "+
+				ageQueryAnd+
 				ageQuery2+
+				hireQuery+
 				hireQuery2+
 				" AND YEAR(hire_date) BETWEEN ? AND ? "+
 				" LIMIT ?, ?";
@@ -211,7 +182,7 @@
 		PreparedStatement stmt2 = null;
 		
 		//성별, 이름, 고용일, 나이대 모두 공백일 경우 기본 리스트를 실행한다
-		if(gender.equals("") && name.equals("") && (hireFirst.equals("") && hireSecond.equals("") && ageQuery2.equals(""))){
+		if(gender.equals("") && name.equals("") && (hireFirst.equals("") && hireSecond.equals("") && ageQuery.equals(""))){
 			sql2 = "SELECT count(*) FROM employees";
 			//해당 쿼리문을 DB에서 실행가능하도록 교체
 			stmt2 = conn.prepareStatement(sql1);
@@ -224,7 +195,9 @@
 					" FROM employees "+
 					" where gender like ? "+
 					" and concat(first_name,' ',last_name) like ? "+
+					ageQueryAnd+
 					ageQuery2+
+					hireQuery+
 					hireQuery2+
 					" AND YEAR(hire_date) BETWEEN ? AND ? ";
 			//해당 쿼리문을 DB에서 실행가능하도록 교체
@@ -282,9 +255,19 @@
 		lastPage=lastPage+1;
 	}
 	System.out.println(RED+"empList2.lastPage-->" + lastPage);
+//-------------------------------------------------------나이 구하기-----------------------------------------------
+	//오늘 날짜 데이터 구하기
+	Calendar today = Calendar.getInstance();
+	System.out.println(BLUE+"empList2.today -->" + today);
 	
-	//-------------------------------------------------------나이 구하기-----------------------------------------------
-	
+	//오늘 날짜의 년,월,일 구하기
+	int todayYear = today.get(Calendar.YEAR);
+	int todayMonth = today.get(Calendar.MONTH)+1;
+	int todayDay = today.get(Calendar.DATE);
+	//오늘 날짜 디버깅
+	System.out.println(BLUE+"empList2.todayYear -->" + todayYear);
+	System.out.println(BLUE+"empList2.todayMonth -->" + todayMonth);
+	System.out.println(BLUE+"empList2.todayDay -->" + todayDay);
 	
 	//age를 배열형태로 저장하기 위해 forreach 문 선언
 	for(Employ e : employList){
@@ -293,8 +276,6 @@
 	int birthYear = Integer.parseInt(e.birthDate.substring(0,4));
 	int birthMonth = Integer.parseInt(e.birthDate.substring(5,7));
 	int birthDay = Integer.parseInt(e.birthDate.substring(8));
-	
-	
 	e.age = todayYear-birthYear;
 	
 	//생일이 지났으면 현재년도-생년
@@ -405,7 +386,7 @@
 		<%
 			//나이대 선택해서 해당 나이대에 해당하는 사람들 출력하기
 			//age의 나이대 앞자리 나열
-			int[] age = {10,20,30,40,50,60,70,80,90};
+			int[] age = {1,2,3,4,5,6,7,8,9};
 			//int a가 age배열을 참조
 			for(int a : age){
 				//기본 checked속성 fasle로 실행
@@ -421,12 +402,12 @@
 			        }//for문닫기
 			    }//if문닫기
 		%>	
-				<input type="checkbox" name="ageBox" <%=checked ? "checked" : "" %> value="<%=a %>"><%=a %>대
+				<input type="checkbox" name="ageBox" <%=checked ? "checked" : "" %> value="<%=a %>"><%=a %>0대
 		<%
 			}
 		%>
 	</div><br>
-	<div style="float:right; padding-left:500px;">
+<div style="float:right; padding-left:500px;">
 		<label>고용 월: </label>
 		<%
 			// 고용월 선택해서 해당고용월인 사람들 출력
