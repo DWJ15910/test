@@ -1,7 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+	a{
+		text-decoration: none;
+		color: #000000;
+		font-weight: bold;
+	}
+</style>
 <div>
-	<ul>
-		<li><a href="<%=request.getContextPath()%>/home.jsp">홈으로</a></li>
+	<ul class="list-group list-group-horizontal" >
+		<li class="list-group-item"><a href="<%=request.getContextPath()%>/home.jsp">홈으로</a></li>
 		
 		<!-- 
 			로그인전 : 회원가입 
@@ -10,15 +19,15 @@
 		<%
 			if(session.getAttribute("loginMemberId")==null){ //로그인 전
 		%>
-				<li><a href="<%=request.getContextPath()%>/member/insertMemberForm.jsp">회원가입</a></li>
+				<li class="list-group-item"><a href="<%=request.getContextPath()%>/member/insertMemberForm.jsp">회원가입</a></li>
 		<%
 			} else { //로그인 후
 		%>
-				<li><a href="<%=request.getContextPath()%>/">회원정보</a></li>
-				<li><a href="<%=request.getContextPath()%>/member/logoutAction.jsp">로그아웃</a></li>
+				<li class="list-group-item"><a href="<%=request.getContextPath()%>/">회원정보</a></li>
+				<li class="list-group-item"><a href="<%=request.getContextPath()%>/member/logoutAction.jsp">로그아웃</a></li>
 		<%
 			}
 		%>
-		<li><a href="<%=request.getContextPath()%>/.jsp"></a></li>
+		<li class="list-group-item"><a href="<%=request.getContextPath()%>/.jsp"></a></li>
 	</ul>
 </div>

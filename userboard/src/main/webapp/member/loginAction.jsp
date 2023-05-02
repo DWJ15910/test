@@ -43,10 +43,14 @@
 		//세션에 로그인 정보 (memberId)저장
 		session.setAttribute("loginMemberId",rs.getString("memberId"));
 		System.out.println("로그인 성공 세션정보 : " + session.getAttribute("loginMemberId"));
+		String msg = URLEncoder.encode(memberId+"님 안녕하세요","utf-8");
+		response.sendRedirect(request.getContextPath()+"/home.jsp?msg="+msg);
 	} else {//로그인실패
 		System.out.println("로그인실패");
+		String msg = URLEncoder.encode("ID와 비밀번호가 틀렸습니다","utf-8");
+		response.sendRedirect(request.getContextPath()+"/home.jsp?msg="+msg);
 	}
 
-	String msg = URLEncoder.encode(memberId+"님 안녕하세요","utf-8");
-	response.sendRedirect(request.getContextPath()+"/home.jsp?msg="+msg);
+	
+	
 %>

@@ -2,8 +2,10 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.net.*" %>
 <%
-
+	String msg = "";
+	
 	//세션 유효성 검사
+	//로그인된 상태로 들어갈려고하면 home.jsp로 이동
 	if(session.getAttribute("loginMemberId") != null) {
 		response.sendRedirect(request.getContextPath()+"/home.jsp");
 		return;
@@ -15,11 +17,12 @@
 		||request.getParameter("id").equals("")
 		||request.getParameter("pw").equals("")){
 		
-		response.sendRedirect(request.getContextPath()+"/member/insertMemberForm.jsp");
+		msg = URLEncoder.encode("ID와 비밀번호를 모두 입력해주세요","utf-8");
+		response.sendRedirect(request.getContextPath()+"/member/insertMemberForm.jsp?msg="+msg);
 		return;
 	}
 
-	String msg = "";
+	
 	
 	//insertMemberForm에서 입력한 ID와 PW값 불러오기
 	String memberId = request.getParameter("id");
