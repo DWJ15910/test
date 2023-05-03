@@ -71,6 +71,8 @@
 <title>Insert title here</title>
 </head>
 <body>
+	<hr>
+	<h2>rs2 결과셋</h2>
 	<table>
 		<tr>
 			<th>localName</th>
@@ -89,8 +91,12 @@
 			}
 		%>
 	</table>
-	
+	<hr>
+	<h2>r3 결과셋</h2>
 	<ul>
+		<li>
+			<a href="">전체</a>
+		</li>
 		<%
 			for(HashMap<String,Object> m : list3){
 		%>		

@@ -1,4 +1,30 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+<%@ page import="java.util.*" %>
+<%
+	String driver="org.mariadb.jdbc.Driver";
+	String dburl="jdbc:mariadb://127.0.0.1:3306/userboard";
+	String dbuser="root";
+	String dbpw = "java1234";
+	Class.forName(driver);
+	Connection conn = null;
+	PreparedStatement stmt = null;
+	ResultSet rs = null;
+	conn = DriverManager.getConnection(dburl,dbuser,dbpw);
+	
+	String subMenuSql = "select '전체' localName,count(local_name) cnt from board union all select local_name localName,count(local_name) cnt from board group by local_name";
+	PreparedStatement subMenuStmt = conn.prepareStatement(subMenuSql);
+	ResultSet subMenuRs = subMenuStmt.executeQuery();
+	
+	// subMenuList <-- 모델데이터
+	ArrayList<HashMap<String,Object>> subMenuList = new ArrayList<HashMap<String,Object>>();
+	while(subMenuRs.next()){
+		HashMap<String,Object> m = new HashMap<String,Object>();
+		m.put("localName",subMenuRs.getString("localName"));
+		m.put("cnt",subMenuRs.getInt("cnt"));
+		subMenuList.add(m);
+	}
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,16 +44,32 @@
 </head>
 <body>
 	<div class="con">
+		<!-- 메인메뉴 (가로) -->
 		<div>
 			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
 		</div>
-		<%
-			if(request.getParameter("msg") != null){
-		%>
-				<div><%=request.getParameter("msg") %></div>
-		<%
-			}
-		%>
+		<!-- 서브메뉴 (세로) subMenuList모델을 출력 -->
+		<div>
+			<ul>
+				<%
+					for(HashMap<String,Object> m : subMenuList){
+				%>		
+						<li>
+							<a href="<%=request.getContextPath()%>/home.jsp?localName=<%=(String)m.get("localName")%>">
+							<%=(String)m.get("localName") %>(<%=(Integer)m.get("cnt") %>)</a>
+						</li>
+				<%
+					}
+				%>
+			</ul>
+		</div>
+			<%
+				if(request.getParameter("msg") != null){
+			%>
+					<div><%=request.getParameter("msg") %></div>
+			<%
+				}
+			%>
 		<div>
 			<!-- home내용: 로그인폼/ 카테고리별 게시글 5개씩 -->
 			<!-- 로그인폼 -->
