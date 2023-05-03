@@ -70,7 +70,7 @@
 	stmt2.setString(2,memberPw);
 	System.out.println("insertMemberAction.stmt2-->" + stmt2);	
 	
-	int row = stmt.executeUpdate();
+	int row = stmt2.executeUpdate();
 	System.out.println("insertMemberAction.row-->"+row);
 	
 	if(row==1){//정상 작동 하면 홈페이지로 이동
