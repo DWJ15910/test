@@ -3,13 +3,28 @@
 <%@ page import="java.util.*" %>
 <%@ page import="vo.*" %>
 <%
+	// 1. 요청분석(컨트롤러 계층)
+	// 1) session 내장개체
+	// 2) request/reponse JSP내창 객체
+	
+	int currentPage = 1;
 	//localName을 전체를 기본 설정
 	String localName ="전체";
+	
+	
 	//유효성 검사
 	if(request.getParameter("localName") != null){
 		localName = request.getParameter("localName");
 	}
 	
+	if(request.getParameter("currentPage")!=null){
+		currentPage = Integer.parseInt(request.getParameter("currentPage"));
+	}
+	
+	int rowPerPage = 10;
+	int startRow = (currentPage-1)*rowPerPage;
+	
+	int lastPage = 0;
 	
 	//DB연동
 	String driver="org.mariadb.jdbc.Driver";
@@ -32,13 +47,19 @@
 	//submenu로 나올 게시판 sql 분기 작성
 	String subMenuSql2 = null;
 	if(localName.equals("전체")){ //전체를 고를시에 where를 구문에서 삭제하여 전체에서 게시판 출력
-		subMenuSql2 = "SELECT board_no boardNo, local_name localName,board_title boardTitle,substring(board_content,1,10) boardContent,member_id memberId FROM board limit 0,10";
+		subMenuSql2 = "SELECT board_no boardNo, local_name localName,board_title boardTitle,substring(board_content,1,10) boardContent,member_id memberId FROM board limit ?,?";
+		subMenuStmt2 = conn.prepareStatement(subMenuSql2);
+		subMenuStmt2.setInt(1,startRow);
+		subMenuStmt2.setInt(2,rowPerPage);
+		System.out.println("home1.subMenuStmt2-->"+subMenuStmt2);
 	} else { // ?를 통해 클릭한 값의 localName만 출력
-		subMenuSql2 = "SELECT board_no boardNo,local_name localName,board_title boardTitle,substring(board_content,1,10) boardContent,member_id memberId FROM board WHERE local_name = ? limit 0,10";
+		subMenuSql2 = "SELECT board_no boardNo,local_name localName,board_title boardTitle,substring(board_content,1,10) boardContent,member_id memberId FROM board WHERE local_name = ? limit ?,?";
+		subMenuStmt2 = conn.prepareStatement(subMenuSql2);
+		subMenuStmt2.setString(1,localName);
+		subMenuStmt2.setInt(2,startRow);
+		subMenuStmt2.setInt(3,rowPerPage);
+		System.out.println("home2.subMenuStmt2-->"+subMenuStmt2);
 	}
-	subMenuStmt2 = conn.prepareStatement(subMenuSql2);
-	subMenuStmt2.setString(1,localName);
-	System.out.println("home.subMenuStmt2-->"+subMenuStmt2);
 	subMenuRs2 = subMenuStmt2.executeQuery();
 	System.out.println("home.subMenuRs2-->"+subMenuRs2);
 	
@@ -63,6 +84,11 @@
 		localNameList.add(b);
 	}
 	
+	//페이지 이동 조건문 작성
+	String addPage = "";
+	if(localName != null && !localName.equals("")) {
+		addPage += "&localName=" + localName;
+	}
 %>
 <!DOCTYPE html>
 <html>
@@ -160,6 +186,8 @@
 				}
 			%>
 			</table>
+			<a class="btn btn-primary" href="<%=request.getContextPath()%>/home.jsp?currentPage=<%=currentPage-1%>&addPage=<%=addPage%>">이전</a>
+			<a class="btn btn-primary" href="<%=request.getContextPath()%>/home.jsp?currentPage=<%=currentPage+1%>&addPage=<%=addPage%>">다음</a>
 		</div>
 		<!-- copyright -->
 		<div>
