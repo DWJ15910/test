@@ -7,7 +7,7 @@
 	if(request.getParameter("addWriter")==null
 		||request.getParameter("addText")==null
 		||request.getParameter("boardNo")==null){
-			
+			System.out.println("null있음");
 			//3개중 1개라도 null일 경우 home.jsp로 반환
 			response.sendRedirect(request.getContextPath()+"/home.jsp");
 			return;
@@ -37,15 +37,18 @@
 	commentStmt.setString(1,addWirter);
 	commentStmt.setString(2,addText);
 	commentStmt.setInt(3,boardNo);
+	System.out.println("insertCommentAction.commentStmt-->"+commentStmt);
 	
 	//정상일 경우 row값 1반환
 	int row = commentStmt.executeUpdate();
 	
 	if(row==1){//정상일 경우 다시 댓글 입력했던 페이지로 돌아가서 결과확인
 		response.sendRedirect(request.getContextPath()+"/board/boardOne.jsp?boardNo="+boardNo);
+		System.out.println("insertCommentAction.row-->"+row);
 		return;
 	} else {//실패일 경우 홈페이지로 이동
 		response.sendRedirect(request.getContextPath()+"/home.jsp");
+		System.out.println("insertCommentAction.row-->"+row);
 		return;
 	}
 	

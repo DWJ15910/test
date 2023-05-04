@@ -15,6 +15,15 @@
 		return;
 	}
 	
+	//페이징
+	int currentPage = 1;
+	if(request.getParameter("currentPage")!=null){
+		currentPage = Integer.parseInt(request.getParameter("currentPage"));
+	}
+	int rowPerPage = 5;
+	int startRow = (currentPage-1)*rowPerPage;
+	int totalRow = 0;
+	
 	//DB 연동
 	String driver="org.mariadb.jdbc.Driver";
 	String dburl="jdbc:mariadb://127.0.0.1:3306/userboard";
@@ -28,8 +37,10 @@
 	//댓글 출력용 SQL쿼리에 사용할 stmt,rs 출력
 	PreparedStatement oneStmt = null;
 	PreparedStatement commentStmt = null;
+	PreparedStatement totalStmt = null;
 	ResultSet oneRs = null;
 	ResultSet commentRs = null;
+	ResultSet totalRs = null;
 	
 	//상세페이지용 쿼리문 작성
 	String oneListSql = null;
@@ -43,13 +54,36 @@
 	
 	//댓글용 쿼리문 작성
 	String commentSql = null;
-	commentSql = "SELECT member_id memberId, comment_text commentText,createdate FROM comment WHERE board_no=? order by createdate DESC";
+	commentSql = "SELECT member_id memberId, comment_text commentText,createdate FROM comment WHERE board_no=? order by createdate DESC LIMIT ?,?";
 	commentStmt = conn.prepareStatement(commentSql);
 	commentStmt.setInt(1,boardNo);
+	commentStmt.setInt(2,startRow);
+	commentStmt.setInt(3,rowPerPage);
 	commentRs = commentStmt.executeQuery();
 	//디버깅
 	System.out.println("commentStmt-->"+commentStmt);
 	System.out.println("commentRs-->"+commentRs);
+	
+	//페이지의 전체 행 구하는 쿼리문
+	String totalRowSql = null;
+	totalRowSql = "SELECT count(*) FROM comment WHERE board_no=?";
+	totalStmt = conn.prepareStatement(totalRowSql);
+	totalStmt.setInt(1,boardNo);
+	totalRs = totalStmt.executeQuery();
+	//디버깅
+	System.out.println("totalStmt-->"+totalStmt);
+	System.out.println("totalRs-->"+totalRs);
+		
+	//전체 페이지수를 구하고
+	if(totalRs.next()){
+		totalRow=totalRs.getInt("count(*)");
+	}
+	int lastPage = totalRow/rowPerPage;
+	//마지막 페이지가 나머지가 0이 아니면 페이지수 1추가
+	if(totalRow%rowPerPage!=0){
+		lastPage++;
+	}
+	
 	
 	//댓글내용을 배열에 저장하기 위해 class작성 및 배열에 선언
 	ArrayList<Comment> commentList = new ArrayList<Comment>();
@@ -59,6 +93,12 @@
 		c.commentText = commentRs.getString("commentText");
 		c.createdate = commentRs.getString("createdate");
 		commentList.add(c);
+	}
+	
+	//페이지 넘기기 서포트
+	String addPage = "";
+	if(boardNo >0) {
+		addPage += "&boardNo=" + boardNo;
 	}
 %>
 
@@ -82,6 +122,9 @@
 </head>
 <body>
 	<div class="con">
+		<div>
+			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
+		</div>
 	
 		<!-- 상세페이지 출력 -->
 		<h2>상세페이지</h2>
@@ -125,12 +168,34 @@
 		
 		<!-- 댓글 입력 란 -->
 		<h2>댓글</h2>
-		<form action="<%=request.getContextPath() %>/board/boardCommentAction.jsp">
-			<input type="hidden" name="boardNo" value="<%=boardNo%>">
-			<input type="text" name="addWriter" placeholder="member_id" style="width:200px;">
-			<button class="btn btn-primary btn_1" type="submit">입력</button>
-			<input type="text" class="form-control" name="addText" placeholder="댓글 내용을 입력해주세요">
-		</form>
+		<%
+			//로그인 사용자만 댓글 허용
+			if(session.getAttribute("loginMemberId") !=null){
+					String loginMemberId = (String)session.getAttribute("loginMemberId");
+		%>
+			<form action="<%=request.getContextPath() %>/board/insertCommentAction.jsp" method="post">
+				<table class="table">
+					<tr>
+						<td>
+							<input type="hidden" name="boardNo" value="<%=boardNo%>">
+							<input type="text" class="form-control" name="addWriter" style="width:200px;" readonly="readonly" value="<%=loginMemberId%>">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="text" class="form-control" name="addText" placeholder="댓글 내용을 입력해주세요">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<button class="btn btn-primary btn_1" type="submit">입력</button>
+						</td>
+					</tr>
+				</table>
+			</form>
+		<%
+			}
+		%>
 		
 		<!-- 댓글 출력 란 -->
 		<table class="table">
@@ -151,6 +216,21 @@
 				}
 			%>
 		</table>
+		<%
+			if(currentPage>1){
+		%>
+				<a class="btn btn-primary" href="<%=request.getContextPath()%>/board/boardOne.jsp?currentPage=<%=currentPage-1%>&addPage=<%=addPage%>">이전</a>
+		<%	
+			}
+		%>
+				<a class="btn btn-primary" href="<%=request.getContextPath()%>/board/boardOne.jsp?currentPage=<%=currentPage%>&addPage=<%=addPage%>"><%=currentPage %>페이지</a>
+		<%
+			if(currentPage<lastPage){
+		%>
+				<a class="btn btn-primary" href="<%=request.getContextPath()%>/board/boardOne.jsp?currentPage=<%=currentPage+1%>&addPage=<%=addPage%>">다음</a>
+		<%
+			}
+		%>
 	</div>
 </body>
 </html>

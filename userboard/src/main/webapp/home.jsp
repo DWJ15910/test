@@ -23,8 +23,7 @@
 	
 	int rowPerPage = 10;
 	int startRow = (currentPage-1)*rowPerPage;
-	
-	int lastPage = 0;
+
 	
 	//DB연동
 	String driver="org.mariadb.jdbc.Driver";
@@ -36,6 +35,8 @@
 	conn = DriverManager.getConnection(dburl,dbuser,dbpw);
 	PreparedStatement subMenuStmt2 = null;
 	ResultSet subMenuRs2 = null;
+	PreparedStatement totalStmt = null;
+	ResultSet totalRs = null;
 	
 	//submenu 출력을 위한 쿼리 작성
 	String subMenuSql = "select '전체' localName,count(local_name) cnt from board union all select local_name localName,count(local_name) cnt from board group by local_name";
@@ -62,6 +63,27 @@
 	}
 	subMenuRs2 = subMenuStmt2.executeQuery();
 	System.out.println("home.subMenuRs2-->"+subMenuRs2);
+	
+	//페이지의 전체 행 구하는 쿼리문
+	String totalRowSql = null;
+	totalRowSql = "SELECT count(*) FROM board WHERE local_name=?";
+	totalStmt = conn.prepareStatement(totalRowSql);
+	totalStmt.setString(1,localName);
+	totalRs = totalStmt.executeQuery();
+	//디버깅
+	System.out.println("totalStmt-->"+totalStmt);
+	System.out.println("totalRs-->"+totalRs);
+		
+	//전체 페이지수를 구하고
+	int totalRow = 0;
+	if(totalRs.next()){
+		totalRow=totalRs.getInt("count(*)");
+	}
+	int lastPage = totalRow/rowPerPage;
+	//마지막 페이지가 나머지가 0이 아니면 페이지수 1추가
+	if(totalRow%rowPerPage!=0){
+		lastPage++;
+	}
 	
 	// subMenuList <-- 모델데이터
 	//서브메뉴 작성을 위한 해시맵 작성
@@ -186,8 +208,21 @@
 				}
 			%>
 			</table>
+		<%
+			if(currentPage>1){
+		%>
 			<a class="btn btn-primary" href="<%=request.getContextPath()%>/home.jsp?currentPage=<%=currentPage-1%>&addPage=<%=addPage%>">이전</a>
+		<%
+			}
+		%>
+			<a class="btn btn-primary" href="<%=request.getContextPath()%>/home.jsp?currentPage=<%=currentPage%>&addPage=<%=addPage%>"><%=currentPage %>페이지</a>
+		<%
+			if(currentPage<lastPage){
+		%>
 			<a class="btn btn-primary" href="<%=request.getContextPath()%>/home.jsp?currentPage=<%=currentPage+1%>&addPage=<%=addPage%>">다음</a>
+		<%
+			}
+		%>
 		</div>
 		<!-- copyright -->
 		<div>
