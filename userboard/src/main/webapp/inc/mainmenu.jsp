@@ -23,7 +23,7 @@
 		<%
 			} else { //로그인 후
 		%>
-				<li class="list-group-item"><a href="<%=request.getContextPath()%>/">회원정보</a></li>
+				<li class="list-group-item"><a href="<%=request.getContextPath()%>/member/userInformation.jsp">회원정보</a></li>
 				<li class="list-group-item"><a href="<%=request.getContextPath()%>/member/logoutAction.jsp">로그아웃</a></li>
 		<%
 			}

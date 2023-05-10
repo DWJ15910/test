@@ -89,10 +89,22 @@
 	ArrayList<Comment> commentList = new ArrayList<Comment>();
 	while(commentRs.next()){
 		Comment c = new Comment();
-		c.memberId = commentRs.getString("memberId");
-		c.commentText = commentRs.getString("commentText");
-		c.createdate = commentRs.getString("createdate");
+		c.setMemberId(commentRs.getString("memberId"));
+		c.setCommentText(commentRs.getString("commentText"));
+		c.setCreatedate(commentRs.getString("createdate"));
 		commentList.add(c);
+	}
+	
+	Board board = null;
+	if(oneRs.next()){
+		board = new Board();
+		board.setBoardNo(oneRs.getInt("boardNo"));
+		board.setLocalName(oneRs.getString("localName"));
+		board.setBoardTitle(oneRs.getString("boardTitle"));
+		board.setBoardContent(oneRs.getString("boardContent"));
+		board.setMemberId(oneRs.getString("memberId"));
+		board.setCreatedate(oneRs.getString("createdate"));
+		board.setUpdatedate(oneRs.getString("updatedate"));
 	}
 	
 	//페이지 넘기기 서포트
@@ -129,41 +141,34 @@
 		<!-- 상세페이지 출력 -->
 		<h2>상세페이지</h2>
 		<table class="table">
-			<%
-				//단일 이기 때문에 배열에 rs를 저장하지 않고 바로 출력
-				while(oneRs.next()){
-			%>
-				<tr>
-					<th>board_no</th>
-					<td><%=oneRs.getInt("boardNo") %></td>
-				</tr>
-				<tr>
-					<th>local_name</th>
-					<td><%=oneRs.getString("localName") %></td>
-				</tr>
-				<tr>
-					<th>board_title</th>
-					<td><%=oneRs.getString("boardTitle") %></td>
-				</tr>
-				<tr>
-					<th>board_content</th>
-					<td><%=oneRs.getString("boardContent") %></td>
-				</tr>
-				<tr>
-					<th>member_id</th>
-					<td><%=oneRs.getString("memberId") %></td>
-				</tr>
-				<tr>
-					<th>createdate</th>
-					<td><%=oneRs.getString("createdate") %></td>
-				</tr>
-				<tr>
-					<th>updatedate</th>
-					<td><%=oneRs.getString("updatedate") %></td>
-				</tr>
-			<%
-				}
-			%>
+			<tr>
+				<th>board_no</th>
+				<td><%=board.getBoardNo() %></td>
+			</tr>
+			<tr>
+				<th>local_name</th>
+				<td><%=board.getLocalName() %></td>
+			</tr>
+			<tr>
+				<th>board_title</th>
+				<td><%=board.getBoardTitle() %></td>
+			</tr>
+			<tr>
+				<th>board_content</th>
+				<td><%=board.getBoardContent() %></td>
+			</tr>
+			<tr>
+				<th>member_id</th>
+				<td><%=board.getMemberId() %></td>
+			</tr>
+			<tr>
+				<th>createdate</th>
+				<td><%=board.getCreatedate() %></td>
+			</tr>
+			<tr>
+				<th>updatedate</th>
+				<td><%=board.getUpdatedate() %></td>
+			</tr>
 		</table>
 		
 		<!-- 댓글 입력 란 -->
@@ -208,9 +213,9 @@
 				for(Comment c : commentList){
 			%>
 			<tr>
-				<td><%=c.memberId %></td>
-				<td><%=c.commentText %></td>
-				<td><%=c.createdate %></td>
+				<td><%=c.getMemberId() %></td>
+				<td><%=c.getCommentText() %></td>
+				<td><%=c.getCreatedate() %></td>
 			</tr>
 			<%
 				}

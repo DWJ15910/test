@@ -53,6 +53,7 @@
 		subMenuStmt2.setInt(1,startRow);
 		subMenuStmt2.setInt(2,rowPerPage);
 		System.out.println("home1.subMenuStmt2-->"+subMenuStmt2);
+		System.out.println("전체");
 	} else { // ?를 통해 클릭한 값의 localName만 출력
 		subMenuSql2 = "SELECT board_no boardNo,local_name localName,board_title boardTitle,substring(board_content,1,10) boardContent,member_id memberId FROM board WHERE local_name = ? limit ?,?";
 		subMenuStmt2 = conn.prepareStatement(subMenuSql2);
@@ -99,10 +100,10 @@
 	ArrayList<Board> localNameList = new ArrayList<Board>();
 	while(subMenuRs2.next()){
 		Board b = new Board();
-		b.boardNo = subMenuRs2.getInt("boardNo");
-		b.localName = subMenuRs2.getString("localName");
-		b.boardTitle = subMenuRs2.getString("boardTitle");
-		b.boardContent = subMenuRs2.getString("boardContent");
+		b.setBoardNo(subMenuRs2.getInt("boardNo"));
+		b.setLocalName(subMenuRs2.getString("localName"));
+		b.setBoardTitle(subMenuRs2.getString("boardTitle"));
+		b.setBoardContent(subMenuRs2.getString("boardContent"));
 		localNameList.add(b);
 	}
 	
@@ -136,7 +137,7 @@
 		<div>
 			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
 		</div>
-		<div>
+		<div style="color: red;">
 			<%
 				if(request.getParameter("msg") != null){
 			%>
@@ -190,7 +191,7 @@
 		</div>
 		<!-- 게시판 10개 출력 -->
 		<div>
-			<table class="table">
+			<table class="table" style="table-layout: fixed;">
 				<tr>
 					<th style="width:200px;">localName</th>
 					<th style="width:300px;">localTitle</th>
@@ -200,26 +201,39 @@
 				for(Board b : localNameList){
 			%>
 				<tr>
-					<td><a href="<%=request.getContextPath()%>/board/boardOne.jsp?boardNo=<%=b.boardNo%>"><%=b.localName %></a></td>
-					<td><a href="<%=request.getContextPath()%>/board/boardOne.jsp?boardNo=<%=b.boardNo%>"><%=b.boardTitle %></a></td>
-					<td><a href="<%=request.getContextPath()%>/board/boardOne.jsp?boardNo=<%=b.boardNo%>"><%=b.boardContent %></a></td>
+					<td><a href="<%=request.getContextPath()%>/board/boardOne.jsp?boardNo=<%=b.getBoardNo()%>"><%=b.getLocalName() %></a></td>
+					<td><a href="<%=request.getContextPath()%>/board/boardOne.jsp?boardNo=<%=b.getBoardNo()%>"><%=b.getBoardTitle() %></a></td>
+					<td><a href="<%=request.getContextPath()%>/board/boardOne.jsp?boardNo=<%=b.getBoardNo()%>"><%=b.getBoardContent() %></a></td>
 				</tr>
 			<%
 				}
 			%>
 			</table>
+		</div>
+		
+		<div style="text-align: center">
 		<%
-			if(currentPage>1){
+			//1~10번을 눌러도 1~10페이지만 출력되도록 설정
+			int startPage = ((currentPage-1)/10)*10+1;
+			//몇 페이지까지 나오게 하는지 선택 startPage+9와 lastPage중에서 작은 수가 출력된다
+			int endPage = Math.min(startPage+9,lastPage);
+			
+			//startPage숫자가 10초과를 해야 ex)11에서 1로 갈수 있도록 -10으로 설정
+			if(startPage>10){
 		%>
-			<a class="btn btn-primary" href="<%=request.getContextPath()%>/home.jsp?currentPage=<%=currentPage-1%>&addPage=<%=addPage%>">이전</a>
+			<a class="btn btn-primary" href="<%=request.getContextPath()%>/home.jsp?currentPage=<%=startPage-10%>&addPage=<%=addPage%>">이전</a>
 		<%
 			}
+			//보이는 페이지를 startPage부터 endPage까지 1씩 늘려가며 설정
+			for(int i = startPage; i<=endPage; i++){				
 		%>
-			<a class="btn btn-primary" href="<%=request.getContextPath()%>/home.jsp?currentPage=<%=currentPage%>&addPage=<%=addPage%>"><%=currentPage %>페이지</a>
+				<a class="<%=currentPage==i ? "btn btn-danger":"btn btn-primary"%>" href="<%=request.getContextPath()%>/home.jsp?currentPage=<%=i%>&addPage=<%=addPage%>"><%=i %></a>
 		<%
-			if(currentPage<lastPage){
+			}
+			//currentPage 변수대신 endPage변수를 이용하여 최종페이지 전까지만 출력하도록 변경
+			if(endPage<lastPage){
 		%>
-			<a class="btn btn-primary" href="<%=request.getContextPath()%>/home.jsp?currentPage=<%=currentPage+1%>&addPage=<%=addPage%>">다음</a>
+			<a class="btn btn-primary" href="<%=request.getContextPath()%>/home.jsp?currentPage=<%=endPage+1%>&addPage=<%=addPage%>">다음</a>
 		<%
 			}
 		%>

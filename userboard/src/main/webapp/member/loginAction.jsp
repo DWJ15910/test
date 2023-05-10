@@ -17,9 +17,6 @@
 	//디버깅
 	System.out.println("memberId-->"+memberId);
 	System.out.println("memberPw-->"+memberPw);
-	Member paramMember = new Member();
-	paramMember.memberId = memberId;
-	paramMember.memberPw = memberPw;
 	
 	
 	String driver="org.mariadb.jdbc.Driver";
@@ -34,8 +31,8 @@
 	
 	String sql = "SELECT member_id memberId FROM member WHERE member_id = ? and member_pw = PASSWORD(?)";
 	stmt = conn.prepareStatement(sql);
-	stmt.setString(1,paramMember.memberId);
-	stmt.setString(2,paramMember.memberPw);
+	stmt.setString(1,memberId);
+	stmt.setString(2,memberPw);
 	rs = stmt.executeQuery();
 	System.out.println("rs성공"+rs);
 	
