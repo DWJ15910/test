@@ -133,13 +133,16 @@
 </style>
 </head>
 <body>
+
 	<div class="con">
+		<hr>
 		<div>
 			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
 		</div>
-	
+		<hr>
 		<!-- 상세페이지 출력 -->
 		<h2>상세페이지</h2>
+		<hr>
 		<table class="table">
 			<tr>
 				<th>board_no</th>
@@ -170,7 +173,9 @@
 				<td><%=board.getUpdatedate() %></td>
 			</tr>
 		</table>
+		<form action="<%=request.getContextPath() %>/board/deleteBaordForm.jsp">
 		
+		</form>
 		<!-- 댓글 입력 란 -->
 		<h2>댓글</h2>
 		<%

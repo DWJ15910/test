@@ -21,6 +21,8 @@
 		currentPage = Integer.parseInt(request.getParameter("currentPage"));
 	}
 	
+	String loginMemberId = (String)session.getAttribute("loginMemberId");
+	
 	int rowPerPage = 10;
 	int startRow = (currentPage-1)*rowPerPage;
 
@@ -39,7 +41,9 @@
 	ResultSet totalRs = null;
 	
 	//submenu 출력을 위한 쿼리 작성
-	String subMenuSql = "select '전체' localName,count(local_name) cnt from board union all select local_name localName,count(local_name) cnt from board group by local_name";
+	String subMenuSql = "select '전체' localName,count(local_name) cnt from board union all select local_name localName,count(local_name) cnt from board group by local_name"
+						+" "+
+						"UNION ALL SELECT local_name localName, 0 cnt FROM local WHERE local_name NOT IN (SELECT DISTINCT local_name FROM board)";
 	PreparedStatement subMenuStmt = conn.prepareStatement(subMenuSql);
 	System.out.println("home.subMenuStmt-->"+subMenuStmt);
 	ResultSet subMenuRs = subMenuStmt.executeQuery();
@@ -67,9 +71,14 @@
 	
 	//페이지의 전체 행 구하는 쿼리문
 	String totalRowSql = null;
-	totalRowSql = "SELECT count(*) FROM board WHERE local_name=?";
-	totalStmt = conn.prepareStatement(totalRowSql);
-	totalStmt.setString(1,localName);
+	if(localName.equals("전체")){
+		totalRowSql = "SELECT '전체', count(*) FROM board ";
+		totalStmt = conn.prepareStatement(totalRowSql);
+	}else{
+		totalRowSql = "SELECT count(*) FROM board WHERE local_name=?";
+		totalStmt = conn.prepareStatement(totalRowSql);
+		totalStmt.setString(1,localName);
+	}
 	totalRs = totalStmt.executeQuery();
 	//디버깅
 	System.out.println("totalStmt-->"+totalStmt);
@@ -137,6 +146,8 @@
 		<div>
 			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
 		</div>
+		
+		<!-- 메시지 출력 -->
 		<div style="color: red;">
 			<%
 				if(request.getParameter("msg") != null){
@@ -146,24 +157,26 @@
 				}
 			%>
 		</div>
+		
 		<hr>
 		<!-- 서브메뉴 (세로) subMenuList모델을 출력 -->
 		<div style="float:left;">
-			<ul>
+		<h3>카테고리</h3>
+			<ul class="list-group list-group-horizontal" >
 				<%
 					for(HashMap<String,Object> m : subMenuList){
 				%>		
-						<li>
+						<li style="width:70px;" class="list-group-item">
 							<a href="<%=request.getContextPath()%>/home.jsp?localName=<%=(String)m.get("localName")%>">
-							<%=(String)m.get("localName") %>(<%=(Integer)m.get("cnt") %>)</a>
+							<%=(String)m.get("localName") %><br>(<%=(Integer)m.get("cnt") %>)</a>
 						</li>
 				<%
 					}
 				%>
 			</ul>
 		</div>
-			<!-- home내용: 로그인폼/ 카테고리별 게시글 5개씩 -->
-			<!-- 로그인폼 -->
+		
+		<!-- 로그인폼 -->
 		<div style="float:right;">
 			<%
 				if(session.getAttribute("loginMemberId")==null){//로그인전이면 로그인폼 출력
@@ -184,11 +197,19 @@
 					</form>
 					
 			<%
+				}else{
+			%>
+					<table class="table">
+						<tr>
+							<td><%=loginMemberId %>님 접속중 입니다</td>
+						</tr>
+					</table>
+			
+			<%	
 				}
 			%>
-			
-			<!-- 카테고리폼 -->
 		</div>
+		
 		<!-- 게시판 10개 출력 -->
 		<div>
 			<table class="table" style="table-layout: fixed;">
@@ -211,6 +232,7 @@
 			</table>
 		</div>
 		
+		<!-- 페이징 설정 -->
 		<div style="text-align: center">
 		<%
 			//1~10번을 눌러도 1~10페이지만 출력되도록 설정
@@ -238,6 +260,7 @@
 			}
 		%>
 		</div>
+		
 		<!-- copyright -->
 		<div>
 			<%
@@ -246,6 +269,7 @@
 			%>
 			<jsp:include page="/inc/copyright.jsp"></jsp:include>
 		</div>
+		
 	</div>
 </body>
 </html>

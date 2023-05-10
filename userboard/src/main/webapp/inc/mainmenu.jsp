@@ -25,6 +25,8 @@
 		%>
 				<li class="list-group-item"><a href="<%=request.getContextPath()%>/member/userInformation.jsp">회원정보</a></li>
 				<li class="list-group-item"><a href="<%=request.getContextPath()%>/member/logoutAction.jsp">로그아웃</a></li>
+				<li class="list-group-item"><a href="<%=request.getContextPath()%>/board/category.jsp">카테고리 관리</a></li>
+				<li class="list-group-item"><a href="<%=request.getContextPath()%>/board/insertPostForm.jsp">게시글 추가</a></li>
 		<%
 			}
 		%>
