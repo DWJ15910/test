@@ -140,12 +140,13 @@
 </style>
 </head>
 <body>
-	<div class="con">
-		<!-- 메인메뉴 (가로) -->
-		<hr>
-		<div>
+	<hr>
+		<div class="container-fluid">
 			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
 		</div>
+	<div class="con">
+		<!-- 메인메뉴 (가로) -->
+		
 		
 		<!-- 메시지 출력 -->
 		<div style="color: red;">
