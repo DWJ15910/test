@@ -40,7 +40,7 @@
 			<%
 				}else{
 			%>
-					<table class="table">
+					<table class="table table-hover">
 						<tr>
 							<td><%=loginMemberId %>님 접속중 입니다</td>
 						</tr>
