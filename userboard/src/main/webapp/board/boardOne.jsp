@@ -127,25 +127,17 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <style>
-	.con {
-	  width: 50%; /* 원하는 크기로 조정 */
-	  height: auto; /* 내용에 따라 크기 조정 */
-	  margin: 0 auto;
-	}
 	.btn_1 {
 		float:right;
 	}
 </style>
 </head>
 <body>
-	<div class="con">
-		<hr>
-		
-		<!-- 상단 메뉴바 -->
-		<div>
-			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
-		</div>
-		
+	<!-- 상단 메뉴바 -->
+	<div>
+		<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
+	</div>
+	<div class="container">
 		<!-- 상세페이지 출력 -->
 		<hr>
 		<h2>상세페이지</h2>
@@ -240,9 +232,9 @@
 		<table class="table">
 			<tr>
 				<th style="width:100px;">작성자</th>
-				<th style="width:540px;">댓글내용</th>
-				<th style="width:150px;">작성시간</th>
-				<th style="width:80px;">수정</th>
+				<th style="width:700px;">댓글내용</th>
+				<th style="width:300px;">작성시간</th>
+				<th style="width:100px;">수정</th>
 				<th>삭제</th>
 			</tr>
 			<%

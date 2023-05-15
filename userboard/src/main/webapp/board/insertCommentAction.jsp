@@ -12,7 +12,11 @@
 			response.sendRedirect(request.getContextPath()+"/home.jsp");
 			return;
 	}
-	
+	if(session.getAttribute("loginMemberId") == null) {
+		response.sendRedirect(request.getContextPath()+"/home.jsp");
+		System.out.println("세션로그인값없음");
+		return;
+	}
 	//상단의 3개의 데이터를 모두 받아 왔을 경우 변수선언
 	String addWirter = request.getParameter("addWriter");
 	String addText = request.getParameter("addText");

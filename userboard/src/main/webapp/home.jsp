@@ -11,11 +11,16 @@
 	int currentPage = 1;
 	//localName을 전체를 기본 설정
 	String localName ="전체";
-	
+	String search = null;
 	
 	//유효성 검사
 	if(request.getParameter("localName") != null){
 		localName = request.getParameter("localName");
+		System.out.println("home.localName 유효성검사 실패");
+	}
+	
+	if(request.getParameter("search") != null){
+		search = request.getParameter("search");
 		System.out.println("home.localName 유효성검사 실패");
 	}
 	
@@ -64,12 +69,22 @@
 	//submenu로 나올 게시판 sql 분기 작성
 	String subMenuSql2 = null;
 	if(localName.equals("전체")){ //전체를 고를시에 where를 구문에서 삭제하여 전체에서 게시판 출력
-		subMenuSql2 = "SELECT board_no boardNo, local_name localName,board_title boardTitle,substring(board_content,1,10) boardContent,member_id memberId FROM board limit ?,?";
-		subMenuStmt2 = conn.prepareStatement(subMenuSql2);
-		subMenuStmt2.setInt(1,startRow);
-		subMenuStmt2.setInt(2,rowPerPage);
-		System.out.println("home1.subMenuStmt2-->"+subMenuStmt2);
-		System.out.println("전체");
+		if(search!=null){
+			subMenuSql2 = "SELECT board_no boardNo, local_name localName,board_title boardTitle,substring(board_content,1,10) boardContent,member_id memberId FROM board WHERE board_content LIKE ? OR member_id LIKE ? OR board_title LIKE ? limit ?,?";
+			subMenuStmt2 = conn.prepareStatement(subMenuSql2);
+			subMenuStmt2.setString(1, "%" + search + "%");
+			subMenuStmt2.setString(2, "%" + search + "%");
+			subMenuStmt2.setString(3, "%" + search + "%");
+			subMenuStmt2.setInt(4,startRow);
+			subMenuStmt2.setInt(5, rowPerPage);
+		}else{
+			subMenuSql2 = "SELECT board_no boardNo, local_name localName,board_title boardTitle,substring(board_content,1,10) boardContent,member_id memberId FROM board limit ?,?";
+			subMenuStmt2 = conn.prepareStatement(subMenuSql2);
+			subMenuStmt2.setInt(1,startRow);
+			subMenuStmt2.setInt(2,rowPerPage);
+			System.out.println("home1.subMenuStmt2-->"+subMenuStmt2);
+			System.out.println("전체");
+		}
 	} else { // ?를 통해 클릭한 값의 localName만 출력
 		subMenuSql2 = "SELECT board_no boardNo,local_name localName,board_title boardTitle,substring(board_content,1,10) boardContent,member_id memberId FROM board WHERE local_name = ? limit ?,?";
 		subMenuStmt2 = conn.prepareStatement(subMenuSql2);
@@ -84,8 +99,16 @@
 	//페이지의 전체 행 구하는 쿼리문
 	String totalRowSql = null;
 	if(localName.equals("전체")){
-		totalRowSql = "SELECT '전체', count(*) FROM board ";
-		totalStmt = conn.prepareStatement(totalRowSql);
+		if(search!=null){
+			totalRowSql = "SELECT '전체', count(*) FROM board WHERE board_content LIKE ? OR member_id LIKE ? OR board_title LIKE ? ";
+			totalStmt = conn.prepareStatement(totalRowSql);
+			totalStmt.setString(1, "%" + search + "%");
+			totalStmt.setString(2, "%" + search + "%");
+			totalStmt.setString(3, "%" + search + "%");
+		}else{
+			totalRowSql = "SELECT '전체', count(*) FROM board ";
+			totalStmt = conn.prepareStatement(totalRowSql);
+		}
 	}else{
 		totalRowSql = "SELECT count(*) FROM board WHERE local_name=?";
 		totalStmt = conn.prepareStatement(totalRowSql);
@@ -137,6 +160,9 @@
 	if(localName != null && !localName.equals("")) {
 		addPage += "&localName=" + localName;
 	}
+	if(search != null && !search.equals("")) {
+		addPage += "&search=" + search;
+	}
 %>
 <!DOCTYPE html>
 <html>
@@ -145,125 +171,122 @@
 <title>Insert title here</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<style>
-	.con {
-	  width: 50%; /* 원하는 크기로 조정 */
-	  height: auto; /* 내용에 따라 크기 조정 */
-	  margin: 0 auto;
-	}
-	
-</style>
 </head>
 <body>
-	<div class="con">
-		<hr>
-		
-		<!-- 메인메뉴 (가로) -->
 		<div>
 			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
 		</div>
 		
-		<!-- 메시지 출력 -->
-		<div style="color: red;">
-			<%
-				if(request.getParameter("msg") != null){
-			%>
-					<div><%=request.getParameter("msg") %></div>
-			<%
-				}
-			%>
-		</div>
+		<div class="container">
+		<hr>
+		
+		<!-- 메인메뉴 (가로) -->
+		
+		
+		
 		
 		<!-- 서브메뉴 (세로) subMenuList모델을 출력 -->
 		<hr>
-		<div>
-		<h3>카테고리</h3>
-			<ul class="list-group list-group-horizontal" >
-				<%
-					for(HashMap<String,Object> m : subMenuList){
-				%>		
-						<li style="width:70px;" class="list-group-item">
-							<a href="<%=request.getContextPath()%>/home.jsp?localName=<%=(String)m.get("localName")%>">
-							<%=(String)m.get("localName") %><br>(<%=(Integer)m.get("cnt") %>)</a>
-						</li>
-				<%
-					}
-				%>
-			</ul>
-			<hr>
-		</div>
-		
-		<!-- 로그인폼 -->
-		
-		<!-- 개발 환경 및 사항 -->
 		<div class="row">
-			<div class="col-sm-2" style="background: #B2EBF4;">
-			<h5 style="text-align: center">-개요-</h5>
-				게시판 작성<br>
-				기간:23.05~23.05<br>
-				인원: 1명
-			</div>
-			<div class="col-sm-2" style="background: #B2EBF4;">
-			<h5 style="text-align: center">-개발환경-</h5>
-				OS:window10<br>
-				Tool: Eclipse,HeidiSQL<br>
-				DB:MariaDB(3.1.3)<br>
-				WAS: Tomcat (10.1.7)
-			</div>
-			<div class="col-sm-4" style="background: #B2EBF4;">
-			<h5 style="text-align: center">-개발내용-</h5>
-				-1~10페이지 이동 기능 구현<br>
-				-회원가입,댓글,게시물,카테고리 구현<br>
-				-각 항목의 삽입,삭제,수정 기능 구형<br>
+			<div class="col-sm-2">
+			<h3>카테고리</h3>
+				<ul class="list-group" >
+					<%
+						for(HashMap<String,Object> m : subMenuList){
+					%>		
+							<li style="width:200px;" class="list-group-item">
+								<a href="<%=request.getContextPath()%>/home.jsp?localName=<%=(String)m.get("localName")%>">
+								<%=(String)m.get("localName") %>(<%=(Integer)m.get("cnt") %>)</a>
+							</li>
+					<%
+						}
+					%>
+				</ul>
 			</div>
 			
-			<!-- 로그인 폼 출력 -->
-			<div class="col-sm-4">
-				<%
-					if(session.getAttribute("loginMemberId")==null){//로그인전이면 로그인폼 출력
-				%>
-						<form action="<%=request.getContextPath() %>/member/loginAction.jsp" method="post">
-							<h2>로그인</h2>
-							<table class="table table-hover">
-								<tr>
-									<td>아이디</td>
-									<td><input class="form-control" type="text" name="memberId"></td>
-								</tr>
-								<tr>
-									<td>패스워드</td>
-									<td><input class="form-control" type="password" name="memberPw"></td>
-								</tr>
-							</table>
-							<button style="float: right;" class="btn btn-primary" type="submit">로그인</button>
-						</form>
-						
-				<%
-					}else{
-				%>
-						<table class="table">
-							<tr>
-								<td><%=loginMemberId %>님 접속중 입니다</td>
-							</tr>
-						</table>
+			<!-- 로그인폼 -->
+			
+			<!-- 개발 환경 및 사항 -->
+			<div class="col-sm-10">
+				<div class="row">
+					<div class="col-sm-2" style="background: grey; color: #FFFFFF;">
+					<br>
+					<h5 style="text-align: center">-개요-</h5>
+						게시판 작성<br>
+						기간:23.05~23.05<br>
+						인원: 1명
+					</div>
+					<div class="col-sm-2" style="background: grey; color: #FFFFFF;">
+					<br>
+					<h5 style="text-align: center">-개발환경-</h5>
+						OS:window10<br>
+						Tool: Eclipse,HeidiSQL<br>
+						DB:MariaDB(3.1.3)<br>
+						WAS: Tomcat (10.1.7)
+					</div>
+					<div class="col-sm-4" style="background: grey; color: #FFFFFF;">
+					<br>
+					<h5 style="text-align: center">-개발내용-</h5>
+						-1~10페이지 이동 기능 구현<br>
+						-회원가입,댓글,게시물,카테고리 구현<br>
+						-각 항목의 삽입,삭제,수정 기능 구현<br>
+						-검색 기능 구현
+						-로그인 기능 구현
+					</div>
 				
-				<%	
-					}
-				%>
-			</div>
-		</div>
-		<!-- 로그인폼 끝 -->
-		
-	
-		<!-- 게시판 10개 출력 -->
+					<!-- 로그인 폼 출력 -->
+					<div class="col-sm-4">
+						<%
+							if(session.getAttribute("loginMemberId")==null){//로그인전이면 로그인폼 출력
+						%>
+								<form action="<%=request.getContextPath() %>/member/loginAction.jsp" method="post">
+									<h2>로그인</h2>
+									<table class="table table-hover">
+										<tr>
+											<td>아이디</td>
+											<td><input class="form-control" type="text" name="memberId"></td>
+										</tr>
+										<tr>
+											<td>패스워드</td>
+											<td><input class="form-control" type="password" name="memberPw"></td>
+										</tr>
+									</table>
+									<button style="float: right;" class="btn btn-primary" type="submit">로그인</button>
+								</form>
+						<%
+							}else{
+						%>
+								<table class="table">
+									<tr>
+										<td><%=loginMemberId %>님 접속중 입니다</td>
+									</tr>
+								</table>
+						<%	
+							}
+						%>
+						<!-- 메시지 출력 -->
+						<div style="color: red;">
+							<%
+								if(request.getParameter("msg") != null){
+							%>
+									<div><%=request.getParameter("msg") %></div>
+							<%
+								}
+							%>
+						</div>
+					</div><!-- 로그인폼 -->
+				</div><!-- row -->
+				<!-- 게시판 10개 출력 -->
 		<hr>
 		<div>
 			<table class="table table-hover" style="table-layout: fixed;">
 				<tr>
-					<th style="width:200px;">localName</th>
-					<th style="width:300px;">localTitle</th>
-					<th style="width:300px;">boardContent</th>
-					<th>writer</th>
+					<thead class="table-dark">
+						<th style="width:200px;">카테고리명</th>
+						<th style="width:300px;">게시글 제목</th>
+						<th style="width:300px;">내용</th>
+						<th>작성자</th>
+					</thead>
 				</tr>
 			<%
 				for(Board b : localNameList){
@@ -308,6 +331,14 @@
 			}
 		%>
 		</div>
+			</div><!-- col sm 10 -->
+			
+			
+		</div><!-- 큰row -->
+		<!-- 로그인폼 끝 -->
+		
+	
+		
 		
 		<!-- copyright -->
 		<div>

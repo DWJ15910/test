@@ -1,4 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+	if(session.getAttribute("loginMemberId") == null) {
+		response.sendRedirect(request.getContextPath()+"/home.jsp");
+		System.out.println("세션로그인값없음");
+		return;
+	}
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,12 +24,11 @@
 </style>
 </head>
 <body>
-	<div class="con">
+	<div>
+		<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
+	</div>
+	<div class="container">
 		<hr>
-			<div>
-				<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
-			</div>
-			<hr>
 		<form action="<%=request.getContextPath() %>/board/insertBoardAction.jsp">
 			<div style="color: red;">
 				<%

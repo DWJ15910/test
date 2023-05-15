@@ -1,8 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
+	if(session.getAttribute("loginMemberId") == null) {
+		response.sendRedirect(request.getContextPath()+"/home.jsp");
+		System.out.println("세션로그인값없음");
+		return;
+	}
+
 	int commentNo = Integer.parseInt(request.getParameter("commentNo"));
 	int boardNo = Integer.parseInt(request.getParameter("boardNo"));
-
 %>
 <!DOCTYPE html>
 <html>
@@ -11,21 +16,13 @@
 <title>Insert title here</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<style>
-	.con {
-	  width: 50%; /* 원하는 크기로 조정 */
-	  height: auto; /* 내용에 따라 크기 조정 */
-	  margin: 0 auto;
-	}
-</style>
 </head>
 <body>
-	<div class="con">
-		<hr>
-		<!-- 메인메뉴 (가로) -->
-		<div>
-			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
-		</div>
+	<!-- 메인메뉴 (가로) -->
+	<div>
+		<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
+	</div>
+	<div class="container">
 		<hr>
 		<form action="<%=request.getContextPath()%>/board/updateCommentAction.jsp">
 		<h2>댓글 수정</h2>

@@ -3,7 +3,11 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="vo.*" %>
 <%
-	
+	if(session.getAttribute("loginMemberId") == null) {
+		response.sendRedirect(request.getContextPath()+"/home.jsp");
+		System.out.println("세션로그인값없음");
+		return;
+	}
 	//DB연동
 	String driver="org.mariadb.jdbc.Driver";
 	String dburl="jdbc:mariadb://127.0.0.1:3306/userboard";
@@ -36,24 +40,13 @@
 <title>Insert title here</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<style>
-	.con {
-	  width: 50%; /* 원하는 크기로 조정 */
-	  height: auto; /* 내용에 따라 크기 조정 */
-	  margin: 0 auto;
-	}
-	
-</style>
 </head>
 <body>
-	<div class="con">
+	<div>
+		<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
+	</div>
 		<hr>
-			<div>
-				<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
-			</div>
-		<hr>
-		
+		<div class="container">
 		<form action="<%=request.getContextPath() %>/board/deleteBoardAction.jsp">
 			<div style="color: red;">
 				<%
