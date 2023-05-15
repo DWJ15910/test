@@ -39,7 +39,7 @@
 	conn = DriverManager.getConnection(dburl,dbuser,dbpw);
 	
 	//외래키 위반 중복 검사
-	String searchSql ="UPDATE comment SET comment_text=? WHERE comment_no = ?";
+	String searchSql ="UPDATE comment SET comment_text=?,updatedate=now() WHERE comment_no = ?";
 	PreparedStatement searchStmt = conn.prepareStatement(searchSql);
 	searchStmt.setString(1, commentText);
 	searchStmt.setInt(2, commentNo);

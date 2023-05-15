@@ -57,7 +57,7 @@
 	
 	//댓글용 쿼리문 작성
 	String commentSql = null;
-	commentSql = "SELECT member_id memberId, comment_text commentText,createdate,comment_no commentNo FROM comment WHERE board_no=? order by createdate DESC LIMIT ?,?";
+	commentSql = "SELECT member_id memberId, comment_text commentText,createdate,comment_no commentNo ,updatedate FROM comment WHERE board_no=? order by updatedate DESC LIMIT ?,?";
 	commentStmt = conn.prepareStatement(commentSql);
 	commentStmt.setInt(1,boardNo);
 	commentStmt.setInt(2,startRow);
@@ -96,6 +96,7 @@
 		c.setCommentText(commentRs.getString("commentText"));
 		c.setCreatedate(commentRs.getString("createdate"));
 		c.setCommentNo(commentRs.getInt("commentNo"));
+		c.setUpdatedate(commentRs.getString("updatedate"));
 		commentList.add(c);
 	}
 	
@@ -243,7 +244,7 @@
 			<tr>
 				<td><%=c.getMemberId() %></td>
 				<td><%=c.getCommentText() %></td>
-				<td><%=c.getCreatedate() %></td>
+				<td><%=c.getUpdatedate() %></td>
 				
 				<% // 게시물 작성자만 수정 삭제 가능
 					if(session.getAttribute("loginMemberId") != null && session.getAttribute("loginMemberId").equals(c.getMemberId())) {

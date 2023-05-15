@@ -173,18 +173,12 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
+		<!-- 메인메뉴 (가로) -->
 		<div>
 			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
 		</div>
 		
 		<div class="container">
-		<hr>
-		
-		<!-- 메인메뉴 (가로) -->
-		
-		
-		
-		
 		<!-- 서브메뉴 (세로) subMenuList모델을 출력 -->
 		<hr>
 		<div class="row">

@@ -5,7 +5,16 @@
 		System.out.println("세션로그인값없음");
 		return;
 	}
-
+	
+	if(request.getParameter("commentNo")==null
+	||request.getParameter("commentNo").equals("")
+	||request.getParameter("boardNo")==null
+	||request.getParameter("boardNo").equals("")){
+	
+	response.sendRedirect(request.getContextPath()+"/home.jsp");
+	System.out.println("유효성 검사 실패");
+	return;
+	}
 	int commentNo = Integer.parseInt(request.getParameter("commentNo"));
 	int boardNo = Integer.parseInt(request.getParameter("boardNo"));
 %>
