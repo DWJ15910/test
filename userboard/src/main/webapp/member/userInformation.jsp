@@ -3,11 +3,13 @@
 <%@ page import="java.util.*" %>
 <%@ page import="vo.*" %>
 <%
+	//로그인 정보 없을때는 홈으로 반환
 	if(session.getAttribute("loginMemberId") == null) {
 		response.sendRedirect(request.getContextPath()+"/home.jsp");
 		return;
 	}
 	
+	//세션 로그인 값 받기
 	String memberId = (String)session.getAttribute("loginMemberId");
 	System.out.println("memberId-->"+memberId);
 	
@@ -18,16 +20,20 @@
 	String dbpw = "java1234";
 	Class.forName(driver);
 	Connection conn = null;
-	PreparedStatement stmt = null;
-	ResultSet rs = null;
 	conn = DriverManager.getConnection(dburl,dbuser,dbpw);
 	
+	//stmt와 rs 선언
+	PreparedStatement stmt = null;
+	ResultSet rs = null;
+	
+	//멤버 정보 출력 SELECT문 작성
 	String userSql = null;
 	userSql = "SELECT member_id,createdate,updatedate FROM member WHERE member_id = ?";
 	stmt = conn.prepareStatement(userSql);
 	stmt.setString(1,memberId);
 	rs = stmt.executeQuery();
 	
+	//리스트 작성
 	Member user = null;
 	if(rs.next()){
 		user = new Member();
@@ -56,11 +62,15 @@
 <body>
 	<div class="con">
 		<hr>
+		
+		<!-- 상단 메뉴바 -->
 		<div>
 			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
 		</div>
 		<hr>
+		
 		<h2>회원정보</h2>
+		
 		<table class="table">
 			<tr>
 				<th>ID</th>

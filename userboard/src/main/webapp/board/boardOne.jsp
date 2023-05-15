@@ -15,11 +15,14 @@
 		return;
 	}
 	
-	//페이징
+	
+	
+	//댓글 페이지
 	int currentPage = 1;
 	if(request.getParameter("currentPage")!=null){
 		currentPage = Integer.parseInt(request.getParameter("currentPage"));
 	}
+	//페이지당 나올 댓글수
 	int rowPerPage = 5;
 	int startRow = (currentPage-1)*rowPerPage;
 	int totalRow = 0;
@@ -42,27 +45,27 @@
 	ResultSet commentRs = null;
 	ResultSet totalRs = null;
 	
-	//상세페이지용 쿼리문 작성
+	//상세페이지용 출력 쿼리문 작성
 	String oneListSql = null;
 	oneListSql = "SELECT board_no boardNo,local_name localName,board_title boardTitle,board_content boardContent, member_id memberId,createdate,updatedate FROM board WHERE board_no = ?";
 	oneStmt = conn.prepareStatement(oneListSql);
 	oneStmt.setInt(1,boardNo);
 	oneRs = oneStmt.executeQuery();
 	//디버깅
-	System.out.println("oneStmt-->"+oneStmt);
-	System.out.println("oneRs-->"+oneRs);
+	System.out.println("boardOne.oneStmt-->"+oneStmt);
+	System.out.println("boardOne.oneRs-->"+oneRs);
 	
 	//댓글용 쿼리문 작성
 	String commentSql = null;
-	commentSql = "SELECT member_id memberId, comment_text commentText,createdate FROM comment WHERE board_no=? order by createdate DESC LIMIT ?,?";
+	commentSql = "SELECT member_id memberId, comment_text commentText,createdate,comment_no commentNo FROM comment WHERE board_no=? order by createdate DESC LIMIT ?,?";
 	commentStmt = conn.prepareStatement(commentSql);
 	commentStmt.setInt(1,boardNo);
 	commentStmt.setInt(2,startRow);
 	commentStmt.setInt(3,rowPerPage);
 	commentRs = commentStmt.executeQuery();
-	//디버깅
-	System.out.println("commentStmt-->"+commentStmt);
-	System.out.println("commentRs-->"+commentRs);
+	//댓글용 쿼리문 디버깅
+	System.out.println("boardOne.commentStmt-->"+commentStmt);
+	System.out.println("boardOne.commentRs-->"+commentRs);
 	
 	//페이지의 전체 행 구하는 쿼리문
 	String totalRowSql = null;
@@ -71,8 +74,8 @@
 	totalStmt.setInt(1,boardNo);
 	totalRs = totalStmt.executeQuery();
 	//디버깅
-	System.out.println("totalStmt-->"+totalStmt);
-	System.out.println("totalRs-->"+totalRs);
+	System.out.println("boardOne.totalStmt-->"+totalStmt);
+	System.out.println("boardOne.totalRs-->"+totalRs);
 		
 	//전체 페이지수를 구하고
 	if(totalRs.next()){
@@ -92,9 +95,11 @@
 		c.setMemberId(commentRs.getString("memberId"));
 		c.setCommentText(commentRs.getString("commentText"));
 		c.setCreatedate(commentRs.getString("createdate"));
+		c.setCommentNo(commentRs.getInt("commentNo"));
 		commentList.add(c);
 	}
 	
+	//보드 관련 내용 리스트 만들기
 	Board board = null;
 	if(oneRs.next()){
 		board = new Board();
@@ -133,17 +138,31 @@
 </style>
 </head>
 <body>
-
 	<div class="con">
 		<hr>
+		
+		<!-- 상단 메뉴바 -->
 		<div>
 			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
 		</div>
-		<hr>
+		
 		<!-- 상세페이지 출력 -->
+		<hr>
 		<h2>상세페이지</h2>
 		<hr>
-		<table class="table">
+		
+		<!-- 메시지 출력 -->
+		<div style="color: red;">
+			<%
+				if(request.getParameter("msg") != null){
+			%>
+					<div><%=request.getParameter("msg") %></div>
+			<%
+				}
+			%>
+		</div>
+		
+		<table class="table table-hover">
 			<tr>
 				<th>board_no</th>
 				<td><%=board.getBoardNo() %></td>
@@ -173,10 +192,20 @@
 				<td><%=board.getUpdatedate() %></td>
 			</tr>
 		</table>
-		<form action="<%=request.getContextPath() %>/board/deleteBaordForm.jsp">
 		
-		</form>
+		<!-- 수정과 삭제 버튼은 게시물작성자와 로그인한 사람의 아이디가 같을 때만 실행 -->
+		<% // 게시물 작성자만 수정 삭제 가능
+			if(session.getAttribute("loginMemberId") != null && session.getAttribute("loginMemberId").equals(board.getMemberId())) {
+				String loginMemberId = (String)session.getAttribute("loginMemberId");
+		%>
+				<a class="btn btn-primary" href="<%=request.getContextPath() %>/board/updatePostForm.jsp?boardNo=<%=board.getBoardNo() %>">수정</a>
+				<a class="btn btn-primary" href="<%=request.getContextPath() %>/board/deletePostAction.jsp?boardNo=<%=board.getBoardNo() %>">삭제</a>			
+		<%
+			}
+		%>
+		
 		<!-- 댓글 입력 란 -->
+		<hr>
 		<h2>댓글</h2>
 		<%
 			//로그인 사용자만 댓글 허용
@@ -211,8 +240,10 @@
 		<table class="table">
 			<tr>
 				<th style="width:100px;">작성자</th>
-				<th style="width:600px;">댓글내용</th>
+				<th style="width:540px;">댓글내용</th>
 				<th style="width:150px;">작성시간</th>
+				<th style="width:80px;">수정</th>
+				<th>삭제</th>
 			</tr>
 			<%
 				for(Comment c : commentList){
@@ -221,11 +252,23 @@
 				<td><%=c.getMemberId() %></td>
 				<td><%=c.getCommentText() %></td>
 				<td><%=c.getCreatedate() %></td>
+				
+				<% // 게시물 작성자만 수정 삭제 가능
+					if(session.getAttribute("loginMemberId") != null && session.getAttribute("loginMemberId").equals(c.getMemberId())) {
+						String loginMemberId = (String)session.getAttribute("loginMemberId");
+				%>
+				<td><a class="btn btn-primary" href="<%=request.getContextPath() %>/board/updateCommentForm.jsp?commentNo=<%=c.getCommentNo() %>&boardNo=<%=board.getBoardNo()%>">수정</a></td>
+				<td><a class="btn btn-primary" href="<%=request.getContextPath() %>/board/deleteCommentAction.jsp?commentNo=<%=c.getCommentNo() %>&boardNo=<%=board.getBoardNo()%>">삭제</a></td>
+				<%
+					}
+				%>
 			</tr>
 			<%
 				}
 			%>
 		</table>
+		
+		<!-- 댓글 페이징 -->
 		<%
 			if(currentPage>1){
 		%>

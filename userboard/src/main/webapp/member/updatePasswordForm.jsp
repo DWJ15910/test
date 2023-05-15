@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>패스워드 변경</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -21,12 +21,16 @@
 <body>
 	<div class="con">
 		<hr>
+		
+		<!-- 상단메뉴바 -->
 		<div>
 			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
 		</div>
 		<hr>
+		
 		<h2>비밀번호 변경</h2>
 		<form action="<%=request.getContextPath()%>/member/updatePasswordAction.jsp" method="post">
+			<!-- 메세지 출력 -->
 			<div>
 				<%
 					if(request.getParameter("msg") != null){
@@ -36,6 +40,7 @@
 					}
 				%>
 			</div>
+			
 			<table class="table">
 				<tr>
 					<th>이전 비밀번호 입력</th>

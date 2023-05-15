@@ -18,23 +18,25 @@
 	System.out.println("memberId-->"+memberId);
 	System.out.println("memberPw-->"+memberPw);
 	
-	
+	//DB연결
 	String driver="org.mariadb.jdbc.Driver";
 	String dburl="jdbc:mariadb://127.0.0.1:3306/userboard";
 	String dbuser="root";
 	String dbpw = "java1234";
 	Class.forName(driver);
 	Connection conn = null;
-	PreparedStatement stmt = null;
-	ResultSet rs = null;
 	conn = DriverManager.getConnection(dburl,dbuser,dbpw);
 	
+	//stmt,rs선언
+	PreparedStatement stmt = null;
+	ResultSet rs = null;
+	
+	//login sql (비밀번호와 아이디 검증)
 	String sql = "SELECT member_id memberId FROM member WHERE member_id = ? and member_pw = PASSWORD(?)";
 	stmt = conn.prepareStatement(sql);
 	stmt.setString(1,memberId);
 	stmt.setString(2,memberPw);
 	rs = stmt.executeQuery();
-	System.out.println("rs성공"+rs);
 	
 	if(rs.next()){//로그인성공
 		//세션에 로그인 정보 (memberId)저장

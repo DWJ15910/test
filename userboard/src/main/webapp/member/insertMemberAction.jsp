@@ -2,6 +2,7 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.net.*" %>
 <%
+	//메세지 선언
 	String msg = "";
 	
 	//세션 유효성 검사
@@ -38,16 +39,19 @@
 	String dbpw = "java1234";
 	Class.forName(driver);
 	Connection conn = null;
+	conn = DriverManager.getConnection(dburl,dbuser,dbpw);
+	
+	//stmt,rs선언
 	PreparedStatement stmt = null;
 	PreparedStatement stmt2 = null;
 	ResultSet rs = null;
-	conn = DriverManager.getConnection(dburl,dbuser,dbpw);
 	
 	// 중복 체크를 위해 SELECT 쿼리 실행
     String checkSql = "SELECT count(*) FROM member WHERE member_id = ?";
     stmt = conn.prepareStatement(checkSql);
     stmt.setString(1, memberId);
     rs = stmt.executeQuery();
+    
     // 중복된 member_id가 있으면 cnt 카운트가 오름
     int cnt = 0;
     if (rs.next()) {
@@ -60,8 +64,8 @@
         response.sendRedirect(request.getContextPath()+"/member/insertMemberForm.jsp?msg="+msg);
         return;
     }
-    System.out.println("insertMemberAction.stmt-->" + stmt);
 	
+    //회원가입 쿼리문 작성
 	String sql = "INSERT INTO member(member_id,member_pw,createdate,updatedate) values(?,PASSWORD(?),now(),now())";
 	//쿼리문으로 변경
 	stmt2 = conn.prepareStatement(sql);

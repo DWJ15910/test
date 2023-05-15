@@ -30,6 +30,5 @@
 		<%
 			}
 		%>
-		<li class="list-group-item"><a href="<%=request.getContextPath()%>/.jsp"></a></li>
 	</ul>
 </div>

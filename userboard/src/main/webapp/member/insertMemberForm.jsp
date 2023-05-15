@@ -24,10 +24,13 @@
 </head>
 <body>
 	<div class="con">
+		<hr>
+		<div>
+			<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
+		</div>
+		
 		<form action="<%=request.getContextPath() %>/member/insertMemberAction.jsp" method="post">
-			<div>
-				<jsp:include page="/inc/mainmenu.jsp"></jsp:include>
-			</div>
+			<hr>
 			<%
 				if(request.getParameter("msg") != null){
 			%>
