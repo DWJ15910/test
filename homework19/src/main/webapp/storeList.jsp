@@ -67,7 +67,7 @@
 	<h1>음식점 리스트</h1>
 		<table class="table table-striped">
 			<tr>
-				<th>리스트번호</th>
+				<th>번호</th>
 				<th>이름</th>
 				<th>카테고리</th>
 				<th>게시날짜</th>
