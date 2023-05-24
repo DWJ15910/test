@@ -116,11 +116,11 @@ public class PrimitiveMethod {
 		
 
 		for(Student s : db) {
-	         if(s.getId() == student.getId() && s.getPw().equals(student.getPw())) {
-	            return true;
-	         }
-	      }
-	      return false;
+			if(s.getId() == student.getId() && s.getPw().equals(student.getPw())) {
+				return true;
+			}
+		}
+			return false;
 	   
 	}
 	
@@ -138,20 +138,18 @@ public class PrimitiveMethod {
 			return 0;
 		}
 		double avg = 0;
-		for(Student s : students) {
-		int age = currentYear-s.getBirth()+1;
 		int sumAge = 0;
 		int count = 0;
+		for(Student s : students) {
+		int age = currentYear-s.getBirth()+1;
 			if(s.getGender().equals("여")) {
 				sumAge += age;
 				count++;
-			}else {
-				return 0;
 			}
-			
-			avg = (double)sumAge / (double)count;
-			avg = Math.round(avg*100)/100;
 		}
+		avg = (double)sumAge / (double)count;
+		
+		avg = Math.round(avg*100)/100;
 		return avg;
 	}
 	

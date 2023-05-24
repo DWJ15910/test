@@ -7,33 +7,42 @@ import vo.*;
 public class VoidMain {
 
 	public static void main(String[] args) {
+		
+		//1)
 		VoidMethod vm = new VoidMethod();
 		vm.voidParm();
 		
+		//2)
 		int num = 8;
 		vm.intParam(num);
 		
-		String name = "구철수";
-		vm.stringParam(name);
-		
+		//2-1)
 		int a = 18;
 		int b = 20;
 		vm.int2Param(a, b);
 		
+		//3)
+		String name = "구철수";
+		vm.stringParam(name);
+		
+		//4)
 		int[] arr = {10,2,404,5,1,2,777,8,12};
 		vm.intArrayParam(arr);
 		
+		//기본타입 매개변수 vs 참조타입 매개변수
 		int value = 100;
 		vm.valueTypeParam(value);
-		System.out.println(value);
+		System.out.println("기본타입-->"+value);
 		
 		int[] refer = {1,2,3};
 		vm.referTypeParam(refer);
-		System.out.println(refer[0]);
+		System.out.println("참조타입-->"+refer[0]);
 		
+		//5)
 		String[] names = {"김이나","김아나","나아나"};
 		vm.strArrParam(names);
 		
+		//6,7)
 		Student student = new Student();
 		student.setId(1);
 		student.setName("조동욱");
@@ -59,6 +68,7 @@ public class VoidMain {
 		students[2] = student2;
 		vm.clsArrayParam(students);
 		
+		//8)
 		ArrayList<Student> list = new ArrayList<Student>();
 			Student s = new Student();
 			Student s1 = new Student();
@@ -83,6 +93,7 @@ public class VoidMain {
 			list.add(s2);
 		vm.clsArrListParam(list);
 		
+		//9)
 		Emp emp = new Emp();
 		emp.setEmpName("루피");
 		Student hkd = new Student();

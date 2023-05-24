@@ -13,47 +13,47 @@ public class VoidMethod {
 	private HashMap<String, Object>[] empList;
 	//1)매개변수 : 없음
 	public void voidParm() {
-		System.out.println("안녕하세요 구디 아카데미 입니다");
+		System.out.println("1번-->안녕하세요 구디 아카데미 입니다");
 	}
 	
 	//2)매개변수 : 기본타입
 	public void intParam(int num) {
 		if(num % 2 == 0) {
-			System.out.println("입력한"+num+"은 짝수입니다");
+			System.out.println("2번-->입력한"+num+"은 짝수입니다");
 			return;
 		}
-		System.out.println("입력한"+num+"은 홀수입니다");
+		System.out.println("2번-->입력한"+num+"은 홀수입니다");
 	}
 	
 	//2-1) 두개의 숫자 int 를 입력 받아 21을 넘기지 않으면서 21에 더 가까운 수를 출력하는 메서드
 	public void int2Param(int a,int b) {
 		//a,b중 
 		if(a > 21 && b > 21) {
-	         System.out.println("없음");
+	         System.out.println("2-1번-->없음");
 	      } else if (a > 21) {
-	         System.out.println(b);
+	         System.out.println("2-1번-->"+b);
 	      } else if (b > 21) {
-	         System.out.println(a);
+	         System.out.println("2-1번-->"+a);
 	      } else if (a > b){
-	         System.out.println(a);
+	         System.out.println("2-1번-->"+a);
 	      } else {
-	         System.out.println(b);
+	         System.out.println("2-1번-->"+b);
 	      }
 	}
 	
 	//3)매개변수 : String
 	public void stringParam(String name) {
 		if(name.startsWith("김")||name.startsWith("이")||name.startsWith("박")) {
-			System.out.println(name.substring(0,1)+"씨 입니다");
+			System.out.println("3번-->"+name.substring(0,1)+"씨 입니다");
 		} else {
-			System.out.println("김/이/박이 아닙니다");
+			System.out.println("3번-->김/이/박이 아닙니다");
 		}
 	}
 	
 	//4)매개변수(참조타입) : int 배열
 	public void intArrayParam(int[] arr) {
 		if(arr == null || arr.length==0) {
-			System.out.println("입력 ERROR");
+			System.out.println("4번-->입력 ERROR");
 			return;
 		}
 		int max = arr[0];
@@ -62,8 +62,9 @@ public class VoidMethod {
 				max=arr[i];
 			}
 		}
-		System.out.println(max+" 입니다");
+		System.out.println("4번-->"+max+" 입니다");
 	}
+	
 	// #기본타입 매개변수 vs 참조타입 매개변수
 	public void valueTypeParam(int value) {
 		value = 777;
@@ -73,13 +74,12 @@ public class VoidMethod {
 	}
 	
 	// 5) 매개변수 : 배열(Stirng 배열)
-	
 	// a. 어떤값을 입력 받을 것인가? 사람이름 배열 입력
 	// b. 어떻게 처리 (구현)할 것인가? "김"씨 성의 인원을 출력
 	// c. 어떤 값을 반환 할 것인가? void
 	public void strArrParam(String[] names) {
 		if(names==null || names.length == 0) {
-			System.out.println("입력이 없습니다");
+			System.out.println("5번-->입력이 없습니다");
 			return;
 		}
 		
@@ -89,7 +89,7 @@ public class VoidMethod {
 				nameCnt++;
 			}
 		}
-		System.out.printf("전체 %d명 중 김씨는 %d명 입니다\n", names.length,nameCnt);
+		System.out.printf("5번-->전체 %d명 중 김씨는 %d명 입니다\n", names.length,nameCnt);
 	}
 	
 	// 6) 매개변수 : 클래스 
@@ -101,7 +101,7 @@ public class VoidMethod {
 		if(student==null
 				||student.getName()==null
 				||student.getGender()==null) {
-			System.out.println("값을 입력해주세요");
+			System.out.println("6번-->값을 입력해주세요");
 			return;
 		}
 		Calendar today = Calendar.getInstance();
@@ -112,7 +112,7 @@ public class VoidMethod {
 		int birth = todayDate-student.getBirth();
 		String gender = student.getGender();
 		
-		System.out.printf("%d번,%sXX,%s자,만%d살\n", id,name,gender,birth);
+		System.out.printf("6번-->%d번,%sXX,%s자,만%d살\n", id,name,gender,birth);
 	}
 	
 	// 7) 매개변수 : 배열(클래스 배열)
@@ -121,7 +121,7 @@ public class VoidMethod {
 	// c. 어떤 값을 반환 할 것인가? void
 	public void clsArrayParam(Student[] students) {
 		if(students==null || students.length == 0) {
-			System.out.println("입력이 없습니다");
+			System.out.println("7번-->입력이 없습니다");
 			return;
 		}
 		
@@ -138,7 +138,7 @@ public class VoidMethod {
 				womanCnt++;
 			}
 		}
-		System.out.printf("남자 %d명, 여자 %d명 입니다\n", manCnt,womanCnt);
+		System.out.printf("7번-->남자 %d명, 여자 %d명 입니다\n", manCnt,womanCnt);
 		
 		
 	}
@@ -153,7 +153,7 @@ public class VoidMethod {
 		int todayDate = today.get(Calendar.YEAR);
 		
 		if(list==null || list.size() == 0) {
-			System.out.println("입력이 없습니다");
+			System.out.println("8번-->입력이 없습니다");
 			return;
 		}
 		int age10 = 0;
@@ -163,7 +163,7 @@ public class VoidMethod {
 		
 		for(Student s : list) {
 			if(s == null) {
-				System.out.println("값없음");
+				System.out.println("8번-->값없음");
 				return;
 			}
 			int age = todayDate-s.getBirth()+1;
@@ -174,29 +174,29 @@ public class VoidMethod {
 			}else if(age/10*10==30){
 				age30++;
 			}else {
-				System.out.println("10,20,30대가 아닙니다");
+				System.out.println("8번-->10,20,30대가 아닙니다");
 				return;
 			}
 		}
-		System.out.printf("전체 %d 명,10대 %d명, 20대 %d명 ,30대 %d명 입니다\n",list.size(), age10,age20,age30);
+		System.out.printf("8번-->전체 %d 명,10대 %d명, 20대 %d명 ,30대 %d명 입니다\n",list.size(), age10,age20,age30);
 		
 		
 	}
-	// 8)) 매개변수 : HashMap
+	// 9)) 매개변수 : HashMap
 	// a. 어떤값을 입력 받을 것인가? Student1명, Emp 1명 --> HashMap 하나를 입력
 	// b. 어떻게 처리 (구현)할 것인가? 학생이름 xxx이고, 담당직원의 이름은 xxx입니다 + 유효성검사
 	// c. 어떤 값을 반환 할 것인가? void
 	public void mapParam(HashMap<String,Object> map) {
 		
 		if(map==null || map.size() == 0) {
-			System.out.println("입력이 없습니다");
+			System.out.println("9번-->입력이 없습니다");
 			return;
 		}
 		
 		Emp emp = (Emp)(map.get("e1"));
 		Student student = (Student)(map.get("s1"));
 		
-		System.out.printf("학생 %s의 담당직원은 %s 입니다\n",student.getName(),emp.getEmpName());
+		System.out.printf("9번-->학생 %s의 담당직원은 %s 입니다\n",student.getName(),emp.getEmpName());
 
 	}
 	
